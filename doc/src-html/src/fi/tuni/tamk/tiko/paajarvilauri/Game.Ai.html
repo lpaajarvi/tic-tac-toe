@@ -1,0 +1,1765 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>package src.fi.tuni.tamk.tiko.paajarvilauri;<a name="line.1"></a>
+<span class="sourceLineNo">002</span><a name="line.2"></a>
+<span class="sourceLineNo">003</span>import java.util.Scanner;<a name="line.3"></a>
+<span class="sourceLineNo">004</span>import src.fi.tuni.tamk.tiko.paajarvilauri.util.Arrays;<a name="line.4"></a>
+<span class="sourceLineNo">005</span>import src.fi.tuni.tamk.tiko.paajarvilauri.util.Math;<a name="line.5"></a>
+<span class="sourceLineNo">006</span>import src.fi.tuni.tamk.tiko.paajarvilauri.util.Console;<a name="line.6"></a>
+<span class="sourceLineNo">007</span><a name="line.7"></a>
+<span class="sourceLineNo">008</span>/**<a name="line.8"></a>
+<span class="sourceLineNo">009</span> * Contains most of the code used in TicTacToe, including Ai as inner class.<a name="line.9"></a>
+<span class="sourceLineNo">010</span> * <a name="line.10"></a>
+<span class="sourceLineNo">011</span> * &lt;p&gt;<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * This class could be split into many different classes with different tasks.<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * The current version holds almost all functionality of the game.<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * &lt;P&gt;<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * Some of the aspects of this class, which could be separeted and made<a name="line.15"></a>
+<span class="sourceLineNo">016</span> * a class of their own:<a name="line.16"></a>
+<span class="sourceLineNo">017</span> * &lt;P&gt;<a name="line.17"></a>
+<span class="sourceLineNo">018</span> * - The board data. Not sure what other things there could be though, than<a name="line.18"></a>
+<span class="sourceLineNo">019</span> * the char[][] board , which holds the information about the tiles that have<a name="line.19"></a>
+<span class="sourceLineNo">020</span> * been occupied by one of the players, and the empty tiles, and of course<a name="line.20"></a>
+<span class="sourceLineNo">021</span> * the size of the board which is determined by the level length it takes<a name="line.21"></a>
+<span class="sourceLineNo">022</span> * as parameter in its constructor.<a name="line.22"></a>
+<span class="sourceLineNo">023</span> * &lt;P&gt;<a name="line.23"></a>
+<span class="sourceLineNo">024</span> * - Checks made to the board. The following methods could be in this class:<a name="line.24"></a>
+<span class="sourceLineNo">025</span> * &lt;P&gt;<a name="line.25"></a>
+<span class="sourceLineNo">026</span> * boolean checkVictoryCase(..)&lt;BR&gt;<a name="line.26"></a>
+<span class="sourceLineNo">027</span> * int checkCloseVictoryCase(..)&lt;BR&gt;<a name="line.27"></a>
+<span class="sourceLineNo">028</span> * int toHowManyDirectionsIsThisMoveCloseToAwinningMove(..) &lt;BR&gt;<a name="line.28"></a>
+<span class="sourceLineNo">029</span> * boolean isThisAwinningMove(..)&lt;BR&gt;<a name="line.29"></a>
+<span class="sourceLineNo">030</span> * void checkIfThisPlayerWon()&lt;BR&gt;<a name="line.30"></a>
+<span class="sourceLineNo">031</span> * voic checkIfDraw()&lt;BR&gt;<a name="line.31"></a>
+<span class="sourceLineNo">032</span> * Also maybe the checks from the Game's inner class Ai.&lt;BR&gt;<a name="line.32"></a>
+<span class="sourceLineNo">033</span> * &lt;P&gt;<a name="line.33"></a>
+<span class="sourceLineNo">034</span> * - Everything that is printed during the game on console:<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * &lt;P&gt;<a name="line.35"></a>
+<span class="sourceLineNo">036</span> * void clearScreen()&lt;BR&gt;<a name="line.36"></a>
+<span class="sourceLineNo">037</span> * void printBoard()&lt;BR&gt;<a name="line.37"></a>
+<span class="sourceLineNo">038</span> * void printButtons()&lt;BR&gt;<a name="line.38"></a>
+<span class="sourceLineNo">039</span> * void printCursorPosition()&lt;BR&gt;<a name="line.39"></a>
+<span class="sourceLineNo">040</span> *  &lt;P&gt;<a name="line.40"></a>
+<span class="sourceLineNo">041</span> * - User interface, containing basically this wasd+some other keys, as in<a name="line.41"></a>
+<span class="sourceLineNo">042</span> * char[] possibleInputs, and the functionality where it is used. the methods<a name="line.42"></a>
+<span class="sourceLineNo">043</span> * this class could hold:<a name="line.43"></a>
+<span class="sourceLineNo">044</span> * &lt;P&gt;<a name="line.44"></a>
+<span class="sourceLineNo">045</span> * void move(..)&lt;BR&gt;<a name="line.45"></a>
+<span class="sourceLineNo">046</span> * void moveToDirection(..)&lt;BR&gt;<a name="line.46"></a>
+<span class="sourceLineNo">047</span> * void makeSelection(..)&lt;BR&gt;<a name="line.47"></a>
+<span class="sourceLineNo">048</span> * char getDirection(..)&lt;BR&gt;<a name="line.48"></a>
+<span class="sourceLineNo">049</span> * void askAboutExit()&lt;BR&gt;<a name="line.49"></a>
+<span class="sourceLineNo">050</span> * &lt;P&gt;<a name="line.50"></a>
+<span class="sourceLineNo">051</span> * - Coordinates/Cursor, all of the coordinates that are made using posY+posX,<a name="line.51"></a>
+<span class="sourceLineNo">052</span> * curY,curX, compY,compX and some methods that return an array (int[]{ y, x}),<a name="line.52"></a>
+<span class="sourceLineNo">053</span> * that could be isntance of this class as well.<a name="line.53"></a>
+<span class="sourceLineNo">054</span> * It could probably hold a method that takes care of this code, that is used<a name="line.54"></a>
+<span class="sourceLineNo">055</span> * as identical in 2 methods, returning the instance of the class, with the<a name="line.55"></a>
+<span class="sourceLineNo">056</span> * coordinates (int y, int x) that are its attributes.<a name="line.56"></a>
+<span class="sourceLineNo">057</span> * &lt;P&gt;<a name="line.57"></a>
+<span class="sourceLineNo">058</span> *         if(dir==1) {&lt;BR&gt;<a name="line.58"></a>
+<span class="sourceLineNo">059</span> *          dirY=1;&lt;BR&gt;<a name="line.59"></a>
+<span class="sourceLineNo">060</span> *          dirX=0;&lt;BR&gt;<a name="line.60"></a>
+<span class="sourceLineNo">061</span> *      } else if(dir==2) {&lt;BR&gt;<a name="line.61"></a>
+<span class="sourceLineNo">062</span> *          dirY=0;&lt;BR&gt;<a name="line.62"></a>
+<span class="sourceLineNo">063</span> *          dirX=1;&lt;BR&gt;<a name="line.63"></a>
+<span class="sourceLineNo">064</span> *      } else if(dir==3) {&lt;BR&gt;<a name="line.64"></a>
+<span class="sourceLineNo">065</span> *          dirY=1;&lt;BR&gt;<a name="line.65"></a>
+<span class="sourceLineNo">066</span> *          dirX=1;&lt;BR&gt;<a name="line.66"></a>
+<span class="sourceLineNo">067</span> *      } else {&lt;BR&gt;<a name="line.67"></a>
+<span class="sourceLineNo">068</span> *          dirY=1;&lt;BR&gt;<a name="line.68"></a>
+<span class="sourceLineNo">069</span> *          dirX=-1;&lt;BR&gt;<a name="line.69"></a>
+<span class="sourceLineNo">070</span> *      }&lt;BR&gt;<a name="line.70"></a>
+<span class="sourceLineNo">071</span> * &lt;P&gt;<a name="line.71"></a>
+<span class="sourceLineNo">072</span> * - And finally the Game class itself would hold the methods that take care<a name="line.72"></a>
+<span class="sourceLineNo">073</span> * of the game going on, so probably the following methods could stay here:<a name="line.73"></a>
+<span class="sourceLineNo">074</span> * &lt;P&gt;<a name="line.74"></a>
+<span class="sourceLineNo">075</span> * void startNewGame()&lt;BR&gt;<a name="line.75"></a>
+<span class="sourceLineNo">076</span> * void startNewTurn()&lt;BR&gt;<a name="line.76"></a>
+<span class="sourceLineNo">077</span> * void endCurrentPlayersTurn()&lt;BR&gt;<a name="line.77"></a>
+<span class="sourceLineNo">078</span> * void setUpBoard()&lt;BR&gt;<a name="line.78"></a>
+<span class="sourceLineNo">079</span> * void setUpPlayers()&lt;BR&gt;<a name="line.79"></a>
+<span class="sourceLineNo">080</span> * void computerPlaysTheirTurn()&lt;BR&gt;<a name="line.80"></a>
+<span class="sourceLineNo">081</span> * <a name="line.81"></a>
+<span class="sourceLineNo">082</span> * <a name="line.82"></a>
+<span class="sourceLineNo">083</span> * <a name="line.83"></a>
+<span class="sourceLineNo">084</span> * <a name="line.84"></a>
+<span class="sourceLineNo">085</span> * @author Lauri Paajarvi -lauri.paajarvi@tuni.fi-<a name="line.85"></a>
+<span class="sourceLineNo">086</span> * @version 2019.1210<a name="line.86"></a>
+<span class="sourceLineNo">087</span> * @since 1.8<a name="line.87"></a>
+<span class="sourceLineNo">088</span> */<a name="line.88"></a>
+<span class="sourceLineNo">089</span><a name="line.89"></a>
+<span class="sourceLineNo">090</span>class Game {<a name="line.90"></a>
+<span class="sourceLineNo">091</span>    final static char EDGE='#';<a name="line.91"></a>
+<span class="sourceLineNo">092</span>    final static char CURSOR_ON_EMPTY='+';<a name="line.92"></a>
+<span class="sourceLineNo">093</span>    final static char CURSOR_ON_X='%';<a name="line.93"></a>
+<span class="sourceLineNo">094</span>    final static char CURSOR_ON_O='0';<a name="line.94"></a>
+<span class="sourceLineNo">095</span><a name="line.95"></a>
+<span class="sourceLineNo">096</span>    final static char UP='w';<a name="line.96"></a>
+<span class="sourceLineNo">097</span>    final static char RIGHT='d';<a name="line.97"></a>
+<span class="sourceLineNo">098</span>    final static char DOWN='s';<a name="line.98"></a>
+<span class="sourceLineNo">099</span>    final static char LEFT='a';<a name="line.99"></a>
+<span class="sourceLineNo">100</span><a name="line.100"></a>
+<span class="sourceLineNo">101</span>    final static char DOWN_ALTERNATIVE='x';<a name="line.101"></a>
+<span class="sourceLineNo">102</span><a name="line.102"></a>
+<span class="sourceLineNo">103</span>    final static char UPLEFT='q';<a name="line.103"></a>
+<span class="sourceLineNo">104</span>    final static char UPRIGHT='e';<a name="line.104"></a>
+<span class="sourceLineNo">105</span>    final static char DOWNLEFT='z';<a name="line.105"></a>
+<span class="sourceLineNo">106</span>    final static char DOWNRIGHT='c';<a name="line.106"></a>
+<span class="sourceLineNo">107</span>    <a name="line.107"></a>
+<span class="sourceLineNo">108</span>    final static char SELECT=' ';<a name="line.108"></a>
+<span class="sourceLineNo">109</span>    final static char EXIT='t';<a name="line.109"></a>
+<span class="sourceLineNo">110</span><a name="line.110"></a>
+<span class="sourceLineNo">111</span>    final static char CHAR_X='X';<a name="line.111"></a>
+<span class="sourceLineNo">112</span>    final static char CHAR_O='O';<a name="line.112"></a>
+<span class="sourceLineNo">113</span>    final static char EMPTY=' ';<a name="line.113"></a>
+<span class="sourceLineNo">114</span><a name="line.114"></a>
+<span class="sourceLineNo">115</span>    /**<a name="line.115"></a>
+<span class="sourceLineNo">116</span>     * Contains the characters that player can enter in console on their turn.<a name="line.116"></a>
+<span class="sourceLineNo">117</span>     */<a name="line.117"></a>
+<span class="sourceLineNo">118</span>    char[] possibleInputs = new char[]{UP, RIGHT, DOWN, LEFT, DOWN_ALTERNATIVE, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, SELECT, EXIT};<a name="line.118"></a>
+<span class="sourceLineNo">119</span><a name="line.119"></a>
+<span class="sourceLineNo">120</span>    /**<a name="line.120"></a>
+<span class="sourceLineNo">121</span>     * The next 4 variables values will be replaced in the constructor.<a name="line.121"></a>
+<span class="sourceLineNo">122</span>     * &lt;P&gt;<a name="line.122"></a>
+<span class="sourceLineNo">123</span><a name="line.123"></a>
+<span class="sourceLineNo">124</span>     */<a name="line.124"></a>
+<span class="sourceLineNo">125</span>    /**<a name="line.125"></a>
+<span class="sourceLineNo">126</span>     * Size of the board. N * N.<a name="line.126"></a>
+<span class="sourceLineNo">127</span>     */<a name="line.127"></a>
+<span class="sourceLineNo">128</span>    int levelLength=3;<a name="line.128"></a>
+<span class="sourceLineNo">129</span>    /**<a name="line.129"></a>
+<span class="sourceLineNo">130</span>     * How many samy tiles in a row are needed to win<a name="line.130"></a>
+<span class="sourceLineNo">131</span>     */<a name="line.131"></a>
+<span class="sourceLineNo">132</span>    int targetScore=3;<a name="line.132"></a>
+<span class="sourceLineNo">133</span>    /**<a name="line.133"></a>
+<span class="sourceLineNo">134</span>    * Keeps data of the situation in the game (tiles occupied by each player)<a name="line.134"></a>
+<span class="sourceLineNo">135</span>    */ <a name="line.135"></a>
+<span class="sourceLineNo">136</span>    char[][] board = new char[3][3];<a name="line.136"></a>
+<span class="sourceLineNo">137</span>    /**<a name="line.137"></a>
+<span class="sourceLineNo">138</span>     * Whether player is CHAR_X or CHAR_O.<a name="line.138"></a>
+<span class="sourceLineNo">139</span>     */<a name="line.139"></a>
+<span class="sourceLineNo">140</span>    boolean isPlayerX;<a name="line.140"></a>
+<span class="sourceLineNo">141</span><a name="line.141"></a>
+<span class="sourceLineNo">142</span>    /**<a name="line.142"></a>
+<span class="sourceLineNo">143</span>     * Indicates whose turn it currently is.<a name="line.143"></a>
+<span class="sourceLineNo">144</span>     */<a name="line.144"></a>
+<span class="sourceLineNo">145</span>    boolean isItHumansTurn=true;<a name="line.145"></a>
+<span class="sourceLineNo">146</span>    <a name="line.146"></a>
+<span class="sourceLineNo">147</span>    /**<a name="line.147"></a>
+<span class="sourceLineNo">148</span>     * Holds information about each players character used etc (class Player)<a name="line.148"></a>
+<span class="sourceLineNo">149</span>     */<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    Player human;<a name="line.150"></a>
+<span class="sourceLineNo">151</span>    Player computer;<a name="line.151"></a>
+<span class="sourceLineNo">152</span><a name="line.152"></a>
+<span class="sourceLineNo">153</span>    /**<a name="line.153"></a>
+<span class="sourceLineNo">154</span>     * Only instance of the huge inner class Ai that determines computer moves.<a name="line.154"></a>
+<span class="sourceLineNo">155</span>     */<a name="line.155"></a>
+<span class="sourceLineNo">156</span>    Ai ai;<a name="line.156"></a>
+<span class="sourceLineNo">157</span><a name="line.157"></a>
+<span class="sourceLineNo">158</span>    /**<a name="line.158"></a>
+<span class="sourceLineNo">159</span>     * Indicates whether the game is over. This info is used in startNewGame().<a name="line.159"></a>
+<span class="sourceLineNo">160</span>     */<a name="line.160"></a>
+<span class="sourceLineNo">161</span>    boolean roundEnded=false;<a name="line.161"></a>
+<span class="sourceLineNo">162</span><a name="line.162"></a>
+<span class="sourceLineNo">163</span>    /**<a name="line.163"></a>
+<span class="sourceLineNo">164</span>     * Player's cursor's Y position on the board.<a name="line.164"></a>
+<span class="sourceLineNo">165</span>     * &lt;P&gt;<a name="line.165"></a>
+<span class="sourceLineNo">166</span>     * Players cursor position on the board, that can be moved with WASD<a name="line.166"></a>
+<span class="sourceLineNo">167</span>     * keys and other keys in char[] possibleInputs Array. They will also<a name="line.167"></a>
+<span class="sourceLineNo">168</span>     * be used for checks that determine if the last put title brought<a name="line.168"></a>
+<span class="sourceLineNo">169</span>     * them a victory. NOTE: Cursor is never really something that is put to<a name="line.169"></a>
+<span class="sourceLineNo">170</span>     * replace any value in the char[][] board itself, only these coordinates<a name="line.170"></a>
+<span class="sourceLineNo">171</span>     * are used while the board is printed for user to see to show the cursor<a name="line.171"></a>
+<span class="sourceLineNo">172</span>     * position.<a name="line.172"></a>
+<span class="sourceLineNo">173</span>     */<a name="line.173"></a>
+<span class="sourceLineNo">174</span>    int curY=0;<a name="line.174"></a>
+<span class="sourceLineNo">175</span>        /**<a name="line.175"></a>
+<span class="sourceLineNo">176</span>     * Player's cursor's X position on the board.<a name="line.176"></a>
+<span class="sourceLineNo">177</span>     * &lt;P&gt;<a name="line.177"></a>
+<span class="sourceLineNo">178</span>     * Players cursor position on the board, that can be moved with WASD<a name="line.178"></a>
+<span class="sourceLineNo">179</span>     * keys and other keys in char[] possibleInputs Array. They will also<a name="line.179"></a>
+<span class="sourceLineNo">180</span>     * be used for checks that determine if the last put title brought<a name="line.180"></a>
+<span class="sourceLineNo">181</span>     * them a victory. NOTE: Cursor is never really something that is put to<a name="line.181"></a>
+<span class="sourceLineNo">182</span>     * replace any value in the char[][] board itself, only these coordinates<a name="line.182"></a>
+<span class="sourceLineNo">183</span>     * are used while the board is printed for user to see to show the cursor<a name="line.183"></a>
+<span class="sourceLineNo">184</span>     * position.<a name="line.184"></a>
+<span class="sourceLineNo">185</span>     */<a name="line.185"></a>
+<span class="sourceLineNo">186</span>    int curX=0;<a name="line.186"></a>
+<span class="sourceLineNo">187</span><a name="line.187"></a>
+<span class="sourceLineNo">188</span>    /**<a name="line.188"></a>
+<span class="sourceLineNo">189</span>     * Computer's move's (and potential move's) coordinate on the board<a name="line.189"></a>
+<span class="sourceLineNo">190</span>     * &lt;P&gt;<a name="line.190"></a>
+<span class="sourceLineNo">191</span>     * They are used a lot in inner class Ai determining computers future move.<a name="line.191"></a>
+<span class="sourceLineNo">192</span>     */<a name="line.192"></a>
+<span class="sourceLineNo">193</span>    int compY=0;<a name="line.193"></a>
+<span class="sourceLineNo">194</span>        /**<a name="line.194"></a>
+<span class="sourceLineNo">195</span>     * Computer's move's (and potential move's) coordinate on the board<a name="line.195"></a>
+<span class="sourceLineNo">196</span>     * &lt;P&gt;<a name="line.196"></a>
+<span class="sourceLineNo">197</span>     * They are used a lot in inner class Ai determining computers future move.<a name="line.197"></a>
+<span class="sourceLineNo">198</span>     */<a name="line.198"></a>
+<span class="sourceLineNo">199</span>    int compX=0;<a name="line.199"></a>
+<span class="sourceLineNo">200</span>    /**<a name="line.200"></a>
+<span class="sourceLineNo">201</span>     *  Keeps track of empty tiles on board.<a name="line.201"></a>
+<span class="sourceLineNo">202</span>     * &lt;P&gt;<a name="line.202"></a>
+<span class="sourceLineNo">203</span>     * Will be set according to levelSize that is determined in the constructor<a name="line.203"></a>
+<span class="sourceLineNo">204</span>     */ <a name="line.204"></a>
+<span class="sourceLineNo">205</span>    int emptyTilesLeft=9;<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    /**<a name="line.206"></a>
+<span class="sourceLineNo">207</span>     * Keeps track of how many games hvbn played (wins for either player+draws)<a name="line.207"></a>
+<span class="sourceLineNo">208</span>     */<a name="line.208"></a>
+<span class="sourceLineNo">209</span>    int gamesPlayed=0;<a name="line.209"></a>
+<span class="sourceLineNo">210</span><a name="line.210"></a>
+<span class="sourceLineNo">211</span>   /** <a name="line.211"></a>
+<span class="sourceLineNo">212</span>    *  Shown to the player after a draw. loss or a victory.<a name="line.212"></a>
+<span class="sourceLineNo">213</span>    */<a name="line.213"></a>
+<span class="sourceLineNo">214</span>    String gameOverMessage = "";<a name="line.214"></a>
+<span class="sourceLineNo">215</span><a name="line.215"></a>
+<span class="sourceLineNo">216</span>   /**<a name="line.216"></a>
+<span class="sourceLineNo">217</span>    * Changes to false if player wants to quit the game after game has ended.<a name="line.217"></a>
+<span class="sourceLineNo">218</span>    * <a name="line.218"></a>
+<span class="sourceLineNo">219</span>    * &lt;p&gt; Checked after a game is finished, after it is changed to false,<a name="line.219"></a>
+<span class="sourceLineNo">220</span>    * the game will end<a name="line.220"></a>
+<span class="sourceLineNo">221</span>    */ <a name="line.221"></a>
+<span class="sourceLineNo">222</span>    boolean playerWantsToContinue=true;<a name="line.222"></a>
+<span class="sourceLineNo">223</span>    <a name="line.223"></a>
+<span class="sourceLineNo">224</span>    /**<a name="line.224"></a>
+<span class="sourceLineNo">225</span>     * Shown to user each time the refreshview() method is used.<a name="line.225"></a>
+<span class="sourceLineNo">226</span>     * &lt;P&gt;<a name="line.226"></a>
+<span class="sourceLineNo">227</span>     * Console will show these messages after each time refreshView() -method<a name="line.227"></a>
+<span class="sourceLineNo">228</span>     * is called, meaning they will be shown after player has made their move<a name="line.228"></a>
+<span class="sourceLineNo">229</span>     * or tried to put a tile on a place where there is already a tile, and that<a name="line.229"></a>
+<span class="sourceLineNo">230</span>     * is when errorMessage is needed. They will often be empty.<a name="line.230"></a>
+<span class="sourceLineNo">231</span>     */<a name="line.231"></a>
+<span class="sourceLineNo">232</span>    private String infoMessage="";<a name="line.232"></a>
+<span class="sourceLineNo">233</span>        /**<a name="line.233"></a>
+<span class="sourceLineNo">234</span>     * Shown to user each time the refreshview() method is used.<a name="line.234"></a>
+<span class="sourceLineNo">235</span>     * &lt;P&gt;<a name="line.235"></a>
+<span class="sourceLineNo">236</span>     * Console will show these messages after each time refreshView() -method<a name="line.236"></a>
+<span class="sourceLineNo">237</span>     * is called, meaning they will be shown after player has made their move<a name="line.237"></a>
+<span class="sourceLineNo">238</span>     * or tried to put a tile on a place where there is already a tile, and that<a name="line.238"></a>
+<span class="sourceLineNo">239</span>     * is when errorMessage is needed. They will often be empty.<a name="line.239"></a>
+<span class="sourceLineNo">240</span>     */<a name="line.240"></a>
+<span class="sourceLineNo">241</span>    private String errorMessage="";<a name="line.241"></a>
+<span class="sourceLineNo">242</span><a name="line.242"></a>
+<span class="sourceLineNo">243</span>    /**<a name="line.243"></a>
+<span class="sourceLineNo">244</span>     * Ends current players turn<a name="line.244"></a>
+<span class="sourceLineNo">245</span>     */<a name="line.245"></a>
+<span class="sourceLineNo">246</span>    public void endCurrentPlayersTurn() {<a name="line.246"></a>
+<span class="sourceLineNo">247</span>        isItHumansTurn = !isItHumansTurn;<a name="line.247"></a>
+<span class="sourceLineNo">248</span>    }<a name="line.248"></a>
+<span class="sourceLineNo">249</span><a name="line.249"></a>
+<span class="sourceLineNo">250</span>    /**<a name="line.250"></a>
+<span class="sourceLineNo">251</span>     * Checks if there are any tiles left on board. If not, then it's a draw.<a name="line.251"></a>
+<span class="sourceLineNo">252</span>     */<a name="line.252"></a>
+<span class="sourceLineNo">253</span>    public void checkIfDraw() {<a name="line.253"></a>
+<span class="sourceLineNo">254</span>        if (emptyTilesLeft == 0) {<a name="line.254"></a>
+<span class="sourceLineNo">255</span>            //actually probably not needed for both<a name="line.255"></a>
+<span class="sourceLineNo">256</span>            human.addDraw();<a name="line.256"></a>
+<span class="sourceLineNo">257</span>            computer.addDraw();<a name="line.257"></a>
+<span class="sourceLineNo">258</span>            gameOverMessage="It was a draw!";<a name="line.258"></a>
+<span class="sourceLineNo">259</span>            gameOver();<a name="line.259"></a>
+<span class="sourceLineNo">260</span>        }<a name="line.260"></a>
+<span class="sourceLineNo">261</span>    }<a name="line.261"></a>
+<span class="sourceLineNo">262</span>    /**<a name="line.262"></a>
+<span class="sourceLineNo">263</span>     * Prints the contents of the char[] board, while adding EDGE on edges.<a name="line.263"></a>
+<span class="sourceLineNo">264</span>     */<a name="line.264"></a>
+<span class="sourceLineNo">265</span>    public void printBoard() {<a name="line.265"></a>
+<span class="sourceLineNo">266</span>        //makes the boards both sides lengths 2 characters longer, so there is room for the EDGEs<a name="line.266"></a>
+<span class="sourceLineNo">267</span>        char[][] uiBoard = new char[board.length+2][board[0].length+2];<a name="line.267"></a>
+<span class="sourceLineNo">268</span><a name="line.268"></a>
+<span class="sourceLineNo">269</span>        for (int y=0; y&lt;uiBoard.length; y++) {<a name="line.269"></a>
+<span class="sourceLineNo">270</span>            for (int x=0; x&lt;uiBoard[0].length; x++) {<a name="line.270"></a>
+<span class="sourceLineNo">271</span>                if (y==0 || x==0 || y==uiBoard.length-1 || x==uiBoard.length-1) {<a name="line.271"></a>
+<span class="sourceLineNo">272</span>                    System.out.print(EDGE);<a name="line.272"></a>
+<span class="sourceLineNo">273</span>                } else {<a name="line.273"></a>
+<span class="sourceLineNo">274</span>                    if (y-1 != curY || x-1 != curX) {<a name="line.274"></a>
+<span class="sourceLineNo">275</span>                        System.out.print(board[y-1][x-1]);<a name="line.275"></a>
+<span class="sourceLineNo">276</span>                    } else {<a name="line.276"></a>
+<span class="sourceLineNo">277</span>                        if (board[curY][curX]==CHAR_X) {<a name="line.277"></a>
+<span class="sourceLineNo">278</span>                            System.out.print(CURSOR_ON_X);<a name="line.278"></a>
+<span class="sourceLineNo">279</span>                        } else if (board[curY][curX]==CHAR_O) {<a name="line.279"></a>
+<span class="sourceLineNo">280</span>                            System.out.print(CURSOR_ON_O);<a name="line.280"></a>
+<span class="sourceLineNo">281</span>                        } else {<a name="line.281"></a>
+<span class="sourceLineNo">282</span>                            System.out.print(CURSOR_ON_EMPTY);<a name="line.282"></a>
+<span class="sourceLineNo">283</span>                        }<a name="line.283"></a>
+<span class="sourceLineNo">284</span>                    }<a name="line.284"></a>
+<span class="sourceLineNo">285</span>                }<a name="line.285"></a>
+<span class="sourceLineNo">286</span>            }<a name="line.286"></a>
+<span class="sourceLineNo">287</span>            System.out.println();<a name="line.287"></a>
+<span class="sourceLineNo">288</span>        }<a name="line.288"></a>
+<span class="sourceLineNo">289</span>    /**<a name="line.289"></a>
+<span class="sourceLineNo">290</span>     * Makes some room just before the new situation on board is printed.<a name="line.290"></a>
+<span class="sourceLineNo">291</span>     */<a name="line.291"></a>
+<span class="sourceLineNo">292</span>    }<a name="line.292"></a>
+<span class="sourceLineNo">293</span>    public void clearScreen() {<a name="line.293"></a>
+<span class="sourceLineNo">294</span>        /*2 can be replaced by for example 45 to make this look a bit more like a real game and not just lines in a console.<a name="line.294"></a>
+<span class="sourceLineNo">295</span>        maybe clearScreen isn't that good name for this method anymore since i thought it's maybe better to just have 2 lines*/<a name="line.295"></a>
+<span class="sourceLineNo">296</span>        for(int i=0; i&lt;2; i++) {<a name="line.296"></a>
+<span class="sourceLineNo">297</span>            System.out.println();<a name="line.297"></a>
+<span class="sourceLineNo">298</span>        }<a name="line.298"></a>
+<span class="sourceLineNo">299</span>    }<a name="line.299"></a>
+<span class="sourceLineNo">300</span>    /**<a name="line.300"></a>
+<span class="sourceLineNo">301</span>     * Prints buttons that player can use to play the game and some game stats.<a name="line.301"></a>
+<span class="sourceLineNo">302</span>     */<a name="line.302"></a>
+<span class="sourceLineNo">303</span>    public void printButtons() {<a name="line.303"></a>
+<span class="sourceLineNo">304</span>        /*this will print pressable buttons (possible inputs). If the final chars UP, UPRIGHT etc would be modified,<a name="line.304"></a>
+<span class="sourceLineNo">305</span>        this might need some tweaking too, but it is designed to stay up-to-date, using the final chars of this class.<a name="line.305"></a>
+<span class="sourceLineNo">306</span><a name="line.306"></a>
+<span class="sourceLineNo">307</span>        NOTE: Space Button is typed as [SPACE] here so if the final char SELECT in this class would be changed from ' '<a name="line.307"></a>
+<span class="sourceLineNo">308</span>        to something else, it would not be updated automatically here*/<a name="line.308"></a>
+<span class="sourceLineNo">309</span><a name="line.309"></a>
+<span class="sourceLineNo">310</span>        System.out.println("Move the cursor ("+CURSOR_ON_EMPTY+") or make a selection");<a name="line.310"></a>
+<span class="sourceLineNo">311</span>        System.out.println("by pressing one of these buttons and [ENTER]:");<a name="line.311"></a>
+<span class="sourceLineNo">312</span>        System.out.println();<a name="line.312"></a>
+<span class="sourceLineNo">313</span>        System.out.println(UPLEFT+"  "+UP+"  "+UPRIGHT+"     Select: [SPACE] | Scoreboard (Wins):");<a name="line.313"></a>
+<span class="sourceLineNo">314</span>        System.out.println(" \\   /                      |");<a name="line.314"></a>
+<span class="sourceLineNo">315</span>        System.out.println(LEFT+"-   -"+RIGHT+"     Exit Game: "+EXIT+"    |  Human    : "+human.wins() );<a name="line.315"></a>
+<span class="sourceLineNo">316</span>        System.out.println(" / "+DOWN+" \\                      |  Computer : "+computer.wins() );<a name="line.316"></a>
+<span class="sourceLineNo">317</span>        System.out.println(DOWNLEFT+"  "+DOWN_ALTERNATIVE+"  "+DOWNRIGHT+"                     |  Draws    : "+human.draws() );<a name="line.317"></a>
+<span class="sourceLineNo">318</span>    }<a name="line.318"></a>
+<span class="sourceLineNo">319</span>    /**<a name="line.319"></a>
+<span class="sourceLineNo">320</span>     * Calls a few methods to print the board and some other info.<a name="line.320"></a>
+<span class="sourceLineNo">321</span>     */<a name="line.321"></a>
+<span class="sourceLineNo">322</span>    public void refreshView() {<a name="line.322"></a>
+<span class="sourceLineNo">323</span>        clearScreen();<a name="line.323"></a>
+<span class="sourceLineNo">324</span>        printButtons();<a name="line.324"></a>
+<span class="sourceLineNo">325</span>        printBoard();<a name="line.325"></a>
+<span class="sourceLineNo">326</span>        <a name="line.326"></a>
+<span class="sourceLineNo">327</span>        printCursorPosition();<a name="line.327"></a>
+<span class="sourceLineNo">328</span>        //if there is errorMessage to be shown, it will be shown first on the left to catch the attention<a name="line.328"></a>
+<span class="sourceLineNo">329</span>        if (!errorMessage.equals("")) {<a name="line.329"></a>
+<span class="sourceLineNo">330</span>            System.out.println(" | "+errorMessage);<a name="line.330"></a>
+<span class="sourceLineNo">331</span>        }<a name="line.331"></a>
+<span class="sourceLineNo">332</span>        if (!infoMessage.equals("")) {<a name="line.332"></a>
+<span class="sourceLineNo">333</span>            System.out.println(" | "+infoMessage);<a name="line.333"></a>
+<span class="sourceLineNo">334</span>        }<a name="line.334"></a>
+<span class="sourceLineNo">335</span>    }<a name="line.335"></a>
+<span class="sourceLineNo">336</span>    /**<a name="line.336"></a>
+<span class="sourceLineNo">337</span>     * Prints the human player's "cursor's" coordinates.<a name="line.337"></a>
+<span class="sourceLineNo">338</span>     */<a name="line.338"></a>
+<span class="sourceLineNo">339</span>    public void printCursorPosition() {<a name="line.339"></a>
+<span class="sourceLineNo">340</span>        /*the reason I'm adding 1 to these attributes, is that I'd think people are more used to the coordinates that start from<a name="line.340"></a>
+<span class="sourceLineNo">341</span>        1 instead of 0. People who do coding might get more used to 0 being the first one and the last coordinate being 1 less than<a name="line.341"></a>
+<span class="sourceLineNo">342</span>        the actual length, since that's how indexes are in arrays, but for most people I'd think this way here is more easier to understand*/<a name="line.342"></a>
+<span class="sourceLineNo">343</span>        System.out.print("Position ["+(curY+1)+","+(curX+1)+"]");<a name="line.343"></a>
+<span class="sourceLineNo">344</span>        System.out.print(board[curY][curX]+" ");<a name="line.344"></a>
+<span class="sourceLineNo">345</span>    }<a name="line.345"></a>
+<span class="sourceLineNo">346</span>    /**<a name="line.346"></a>
+<span class="sourceLineNo">347</span>     * Returns the direction where player wants to move, or the task chosen.<a name="line.347"></a>
+<span class="sourceLineNo">348</span>     * &lt;P&gt;<a name="line.348"></a>
+<span class="sourceLineNo">349</span>     * @return character from char[] possibleInputs<a name="line.349"></a>
+<span class="sourceLineNo">350</span>     */<a name="line.350"></a>
+<span class="sourceLineNo">351</span>    //similar method with char[] array (possibleInputs) as its parameter might be good to put in Util.Console.java, but it's used only<a name="line.351"></a>
+<span class="sourceLineNo">352</span>    //once in this program so it can wait<a name="line.352"></a>
+<span class="sourceLineNo">353</span>    public char getDirection() {<a name="line.353"></a>
+<span class="sourceLineNo">354</span>        <a name="line.354"></a>
+<span class="sourceLineNo">355</span>        boolean validValue=false;<a name="line.355"></a>
+<span class="sourceLineNo">356</span>        //'-' is chosen here just because it's not something that can be really pressed. Any char that is not part of char[] possibleInputs would do.<a name="line.356"></a>
+<span class="sourceLineNo">357</span>        char dir='-';<a name="line.357"></a>
+<span class="sourceLineNo">358</span>        String userInput = "";<a name="line.358"></a>
+<span class="sourceLineNo">359</span>        while (!validValue) {<a name="line.359"></a>
+<span class="sourceLineNo">360</span>            Scanner inp = new Scanner(System.in);<a name="line.360"></a>
+<span class="sourceLineNo">361</span>            <a name="line.361"></a>
+<span class="sourceLineNo">362</span>            userInput = inp.nextLine();<a name="line.362"></a>
+<span class="sourceLineNo">363</span>            if (userInput.length()&gt;0) {<a name="line.363"></a>
+<span class="sourceLineNo">364</span>                userInput=userInput.toLowerCase();<a name="line.364"></a>
+<span class="sourceLineNo">365</span>                dir=userInput.charAt(0);<a name="line.365"></a>
+<span class="sourceLineNo">366</span>            }<a name="line.366"></a>
+<span class="sourceLineNo">367</span>            if (Arrays.containsChar(dir, possibleInputs)) {<a name="line.367"></a>
+<span class="sourceLineNo">368</span>                validValue=true;<a name="line.368"></a>
+<span class="sourceLineNo">369</span>            } else {<a name="line.369"></a>
+<span class="sourceLineNo">370</span>                errorMessage="Invalid input. Instead of {"+Arrays.charArrayToString(possibleInputs)+"}, you typed "+dir;<a name="line.370"></a>
+<span class="sourceLineNo">371</span>                refreshView();<a name="line.371"></a>
+<span class="sourceLineNo">372</span>            }<a name="line.372"></a>
+<span class="sourceLineNo">373</span>        }<a name="line.373"></a>
+<span class="sourceLineNo">374</span>        return dir;<a name="line.374"></a>
+<span class="sourceLineNo">375</span>    }<a name="line.375"></a>
+<span class="sourceLineNo">376</span>    /**<a name="line.376"></a>
+<span class="sourceLineNo">377</span>     * Moves the cursor's position to the direction determined by params<a name="line.377"></a>
+<span class="sourceLineNo">378</span>     * &lt;P&gt;<a name="line.378"></a>
+<span class="sourceLineNo">379</span>     * @param amountY new Y coordinate compared to the old position<a name="line.379"></a>
+<span class="sourceLineNo">380</span>     * @param amountX new X coordinate compared to the old position<a name="line.380"></a>
+<span class="sourceLineNo">381</span>     */<a name="line.381"></a>
+<span class="sourceLineNo">382</span>    public void move(int amountY, int amountX) {<a name="line.382"></a>
+<span class="sourceLineNo">383</span>        // we will check if the move is valid, that is if the cursos would stay on board array if the move was completed<a name="line.383"></a>
+<span class="sourceLineNo">384</span>        if(curY+amountY &gt;= 0 &amp;&amp; curY+amountY &lt; board.length &amp;&amp; curX+amountX &gt;= 0 &amp;&amp; curX+amountX &lt; board[0].length) {<a name="line.384"></a>
+<span class="sourceLineNo">385</span>            curY += amountY;<a name="line.385"></a>
+<span class="sourceLineNo">386</span>            curX += amountX;<a name="line.386"></a>
+<span class="sourceLineNo">387</span>            errorMessage="";<a name="line.387"></a>
+<span class="sourceLineNo">388</span>        } else {<a name="line.388"></a>
+<span class="sourceLineNo">389</span>            errorMessage="Oops. You tried to move the cursor out of the board.";<a name="line.389"></a>
+<span class="sourceLineNo">390</span>            infoMessage="";<a name="line.390"></a>
+<span class="sourceLineNo">391</span>        }<a name="line.391"></a>
+<span class="sourceLineNo">392</span>        refreshView();<a name="line.392"></a>
+<span class="sourceLineNo">393</span>    }<a name="line.393"></a>
+<span class="sourceLineNo">394</span>    /**<a name="line.394"></a>
+<span class="sourceLineNo">395</span>     * Calls the move(int,int) method or other task based on the "direction"<a name="line.395"></a>
+<span class="sourceLineNo">396</span>     * &lt;P&gt;<a name="line.396"></a>
+<span class="sourceLineNo">397</span>     * @param d Direction of the move, or the task performed<a name="line.397"></a>
+<span class="sourceLineNo">398</span>     */<a name="line.398"></a>
+<span class="sourceLineNo">399</span>    public void moveToDirection(char d) {<a name="line.399"></a>
+<span class="sourceLineNo">400</span>        //d is short for direction here<a name="line.400"></a>
+<span class="sourceLineNo">401</span>        switch(d) {<a name="line.401"></a>
+<span class="sourceLineNo">402</span>            case UP: move(-1,0);<a name="line.402"></a>
+<span class="sourceLineNo">403</span>            break;<a name="line.403"></a>
+<span class="sourceLineNo">404</span>            case RIGHT: move(0,+1);<a name="line.404"></a>
+<span class="sourceLineNo">405</span>            break;<a name="line.405"></a>
+<span class="sourceLineNo">406</span>            case DOWN:<a name="line.406"></a>
+<span class="sourceLineNo">407</span>            case DOWN_ALTERNATIVE: move(+1,0);<a name="line.407"></a>
+<span class="sourceLineNo">408</span>            break;<a name="line.408"></a>
+<span class="sourceLineNo">409</span>            case LEFT: move(0,-1);<a name="line.409"></a>
+<span class="sourceLineNo">410</span>            break;<a name="line.410"></a>
+<span class="sourceLineNo">411</span>            case UPRIGHT: move(-1,+1);<a name="line.411"></a>
+<span class="sourceLineNo">412</span>            break;<a name="line.412"></a>
+<span class="sourceLineNo">413</span>            case DOWNRIGHT: move(+1,+1);<a name="line.413"></a>
+<span class="sourceLineNo">414</span>            break;<a name="line.414"></a>
+<span class="sourceLineNo">415</span>            case DOWNLEFT: move(+1,-1);<a name="line.415"></a>
+<span class="sourceLineNo">416</span>            break;<a name="line.416"></a>
+<span class="sourceLineNo">417</span>            case UPLEFT: move(-1,-1);<a name="line.417"></a>
+<span class="sourceLineNo">418</span>            break;<a name="line.418"></a>
+<span class="sourceLineNo">419</span>            case SELECT: makeSelection();<a name="line.419"></a>
+<span class="sourceLineNo">420</span>            break;<a name="line.420"></a>
+<span class="sourceLineNo">421</span>            case EXIT: askAboutExit();<a name="line.421"></a>
+<span class="sourceLineNo">422</span>            break;<a name="line.422"></a>
+<span class="sourceLineNo">423</span>        }<a name="line.423"></a>
+<span class="sourceLineNo">424</span>    }<a name="line.424"></a>
+<span class="sourceLineNo">425</span>    /**<a name="line.425"></a>
+<span class="sourceLineNo">426</span>     * Default constructor, not intended for use.<a name="line.426"></a>
+<span class="sourceLineNo">427</span>     */<a name="line.427"></a>
+<span class="sourceLineNo">428</span>    Game() {<a name="line.428"></a>
+<span class="sourceLineNo">429</span>        /*does nothing, should not be used, needs parameters*/<a name="line.429"></a>
+<span class="sourceLineNo">430</span>    }<a name="line.430"></a>
+<span class="sourceLineNo">431</span><a name="line.431"></a>
+<span class="sourceLineNo">432</span>    /**<a name="line.432"></a>
+<span class="sourceLineNo">433</span>     * Constructor that is used to make the game ready.<a name="line.433"></a>
+<span class="sourceLineNo">434</span>     * &lt;P&gt;<a name="line.434"></a>
+<span class="sourceLineNo">435</span>     * @param levelLength Size of the board (N * N)<a name="line.435"></a>
+<span class="sourceLineNo">436</span>     * @param targetScore How many in a row are needed to win the game<a name="line.436"></a>
+<span class="sourceLineNo">437</span>     * @param isPlayerX Does player use the CHAR_X or CHAR_O<a name="line.437"></a>
+<span class="sourceLineNo">438</span>     */<a name="line.438"></a>
+<span class="sourceLineNo">439</span>    Game(int levelLength, int targetScore, boolean isPlayerX) {<a name="line.439"></a>
+<span class="sourceLineNo">440</span>        this.levelLength=levelLength;<a name="line.440"></a>
+<span class="sourceLineNo">441</span>        this.targetScore=targetScore;<a name="line.441"></a>
+<span class="sourceLineNo">442</span>        this.isPlayerX=isPlayerX;<a name="line.442"></a>
+<span class="sourceLineNo">443</span><a name="line.443"></a>
+<span class="sourceLineNo">444</span>        ai = new Ai();<a name="line.444"></a>
+<span class="sourceLineNo">445</span><a name="line.445"></a>
+<span class="sourceLineNo">446</span>        startNewGame();<a name="line.446"></a>
+<span class="sourceLineNo">447</span>    }<a name="line.447"></a>
+<span class="sourceLineNo">448</span>    /**<a name="line.448"></a>
+<span class="sourceLineNo">449</span>     * Creates the instances of Player class<a name="line.449"></a>
+<span class="sourceLineNo">450</span>     */<a name="line.450"></a>
+<span class="sourceLineNo">451</span>    public void setUpPlayers() {<a name="line.451"></a>
+<span class="sourceLineNo">452</span>        if(isPlayerX) {<a name="line.452"></a>
+<span class="sourceLineNo">453</span>            human = new Player(CHAR_X);<a name="line.453"></a>
+<span class="sourceLineNo">454</span>            computer = new Player(CHAR_O);<a name="line.454"></a>
+<span class="sourceLineNo">455</span>        } else {<a name="line.455"></a>
+<span class="sourceLineNo">456</span>            human = new Player(CHAR_O);<a name="line.456"></a>
+<span class="sourceLineNo">457</span>            computer = new Player(CHAR_X);<a name="line.457"></a>
+<span class="sourceLineNo">458</span>        }<a name="line.458"></a>
+<span class="sourceLineNo">459</span>    }<a name="line.459"></a>
+<span class="sourceLineNo">460</span>    /**<a name="line.460"></a>
+<span class="sourceLineNo">461</span>     * Tries to put a player's tile in the position of the cursor.<a name="line.461"></a>
+<span class="sourceLineNo">462</span>     */<a name="line.462"></a>
+<span class="sourceLineNo">463</span>    public void makeSelection() {<a name="line.463"></a>
+<span class="sourceLineNo">464</span>        infoMessage="";<a name="line.464"></a>
+<span class="sourceLineNo">465</span>        char currentTile=board[curY][curX];<a name="line.465"></a>
+<span class="sourceLineNo">466</span>        //if the currentTile is not empty, it can not be used for selection<a name="line.466"></a>
+<span class="sourceLineNo">467</span>        if (currentTile != EMPTY) {<a name="line.467"></a>
+<span class="sourceLineNo">468</span>            errorMessage = "Oops. ";<a name="line.468"></a>
+<span class="sourceLineNo">469</span>            if (currentTile==human.side()) {<a name="line.469"></a>
+<span class="sourceLineNo">470</span>                errorMessage += "You have already occupied this tile!";<a name="line.470"></a>
+<span class="sourceLineNo">471</span>            } else {<a name="line.471"></a>
+<span class="sourceLineNo">472</span>                errorMessage += "This tile is already occupied by this horrible Player "+currentTile+".";<a name="line.472"></a>
+<span class="sourceLineNo">473</span>            }<a name="line.473"></a>
+<span class="sourceLineNo">474</span>            refreshView();<a name="line.474"></a>
+<span class="sourceLineNo">475</span>        // we will go to this loop if the tile is empty<a name="line.475"></a>
+<span class="sourceLineNo">476</span>        } else {<a name="line.476"></a>
+<span class="sourceLineNo">477</span>            board[curY][curX]=human.side();<a name="line.477"></a>
+<span class="sourceLineNo">478</span><a name="line.478"></a>
+<span class="sourceLineNo">479</span>            human.addOccupiedTile();<a name="line.479"></a>
+<span class="sourceLineNo">480</span>            emptyTilesLeft--;<a name="line.480"></a>
+<span class="sourceLineNo">481</span>            if(human.tilesOccupied() &gt;= targetScore) {<a name="line.481"></a>
+<span class="sourceLineNo">482</span>                checkIfThisPlayerWon();<a name="line.482"></a>
+<span class="sourceLineNo">483</span>            }<a name="line.483"></a>
+<span class="sourceLineNo">484</span>            checkIfDraw();<a name="line.484"></a>
+<span class="sourceLineNo">485</span>            endCurrentPlayersTurn();<a name="line.485"></a>
+<span class="sourceLineNo">486</span>        }<a name="line.486"></a>
+<span class="sourceLineNo">487</span>    }<a name="line.487"></a>
+<span class="sourceLineNo">488</span>    /**<a name="line.488"></a>
+<span class="sourceLineNo">489</span>     * Checks if a tile put here is bringing a victory for the playe putting it.<a name="line.489"></a>
+<span class="sourceLineNo">490</span>     * &lt;P&gt;<a name="line.490"></a>
+<span class="sourceLineNo">491</span>     * The method is also used in Ai-classes methods to determine whether there<a name="line.491"></a>
+<span class="sourceLineNo">492</span>     * is a potential victory in that given position.<a name="line.492"></a>
+<span class="sourceLineNo">493</span>     * &lt;P&gt;<a name="line.493"></a>
+<span class="sourceLineNo">494</span>     * @param posY Y-position of the place where the check takes place<a name="line.494"></a>
+<span class="sourceLineNo">495</span>     * @param posX X-position of the place where the check takes place<a name="line.495"></a>
+<span class="sourceLineNo">496</span>     * @return true/false whether it would bring a victory<a name="line.496"></a>
+<span class="sourceLineNo">497</span>     */<a name="line.497"></a>
+<span class="sourceLineNo">498</span>    public boolean isThisAwinningMove(int posY, int posX) {<a name="line.498"></a>
+<span class="sourceLineNo">499</span>         if (checkVictoryCase(1, posY, posX)) {<a name="line.499"></a>
+<span class="sourceLineNo">500</span>            return true;<a name="line.500"></a>
+<span class="sourceLineNo">501</span>        } else if (checkVictoryCase(2, posY, posX)) {<a name="line.501"></a>
+<span class="sourceLineNo">502</span>            return true;<a name="line.502"></a>
+<span class="sourceLineNo">503</span>        } else if (checkVictoryCase(3, posY, posX)) {<a name="line.503"></a>
+<span class="sourceLineNo">504</span>            return true;<a name="line.504"></a>
+<span class="sourceLineNo">505</span>        } else if (checkVictoryCase(4, posY, posX)) {<a name="line.505"></a>
+<span class="sourceLineNo">506</span>            return true;<a name="line.506"></a>
+<span class="sourceLineNo">507</span>        } else {<a name="line.507"></a>
+<span class="sourceLineNo">508</span>            return false;<a name="line.508"></a>
+<span class="sourceLineNo">509</span>        }<a name="line.509"></a>
+<span class="sourceLineNo">510</span>    }<a name="line.510"></a>
+<span class="sourceLineNo">511</span>    /**<a name="line.511"></a>
+<span class="sourceLineNo">512</span>     * Calls new methods if the victory just took place after putting a tile.<a name="line.512"></a>
+<span class="sourceLineNo">513</span>     */<a name="line.513"></a>
+<span class="sourceLineNo">514</span>    public void checkIfThisPlayerWon() {<a name="line.514"></a>
+<span class="sourceLineNo">515</span>        /*Goes around the latest tile that was added and checks if the victory conditions are met.<a name="line.515"></a>
+<span class="sourceLineNo">516</span>        Needs to check it for 4 different cases (top-down, left-right, topleft-bottomright, topright-bottomleft)*/<a name="line.516"></a>
+<span class="sourceLineNo">517</span><a name="line.517"></a>
+<span class="sourceLineNo">518</span>        /*newY and newX will be the starting position for our checks, since this is the location where the newest tile<a name="line.518"></a>
+<span class="sourceLineNo">519</span>        was added for this current player*/<a name="line.519"></a>
+<span class="sourceLineNo">520</span>        int newY=curY;<a name="line.520"></a>
+<span class="sourceLineNo">521</span>        int newX=curX;<a name="line.521"></a>
+<span class="sourceLineNo">522</span><a name="line.522"></a>
+<span class="sourceLineNo">523</span>        //they will be changed in the case it's actually computers turn and not humans turn<a name="line.523"></a>
+<span class="sourceLineNo">524</span>        if (!isItHumansTurn) {<a name="line.524"></a>
+<span class="sourceLineNo">525</span>            newY=compY;<a name="line.525"></a>
+<span class="sourceLineNo">526</span>            newX=compX;<a name="line.526"></a>
+<span class="sourceLineNo">527</span>        }<a name="line.527"></a>
+<span class="sourceLineNo">528</span>        if (isThisAwinningMove(newY, newX)) {<a name="line.528"></a>
+<span class="sourceLineNo">529</span>            refreshView();<a name="line.529"></a>
+<span class="sourceLineNo">530</span>            thisPlayerWon();<a name="line.530"></a>
+<span class="sourceLineNo">531</span>        }<a name="line.531"></a>
+<span class="sourceLineNo">532</span>    }<a name="line.532"></a>
+<span class="sourceLineNo">533</span>    public void gameOver() {<a name="line.533"></a>
+<span class="sourceLineNo">534</span>        gamesPlayed++;<a name="line.534"></a>
+<span class="sourceLineNo">535</span>        refreshView();<a name="line.535"></a>
+<span class="sourceLineNo">536</span>        System.out.println();<a name="line.536"></a>
+<span class="sourceLineNo">537</span>        System.out.println("Game Over. "+gameOverMessage);<a name="line.537"></a>
+<span class="sourceLineNo">538</span>        roundEnded=true;<a name="line.538"></a>
+<span class="sourceLineNo">539</span>    }<a name="line.539"></a>
+<span class="sourceLineNo">540</span>    public void thisPlayerWon() {<a name="line.540"></a>
+<span class="sourceLineNo">541</span>        if (isItHumansTurn) {<a name="line.541"></a>
+<span class="sourceLineNo">542</span>            human.addWin();<a name="line.542"></a>
+<span class="sourceLineNo">543</span>            gameOverMessage="You won this one.";<a name="line.543"></a>
+<span class="sourceLineNo">544</span>        } else {<a name="line.544"></a>
+<span class="sourceLineNo">545</span>            computer.addWin();<a name="line.545"></a>
+<span class="sourceLineNo">546</span>            gameOverMessage="Computer won!";<a name="line.546"></a>
+<span class="sourceLineNo">547</span>        }<a name="line.547"></a>
+<span class="sourceLineNo">548</span>        gameOver();<a name="line.548"></a>
+<span class="sourceLineNo">549</span>    }<a name="line.549"></a>
+<span class="sourceLineNo">550</span>    /**<a name="line.550"></a>
+<span class="sourceLineNo">551</span>     * Used for testing. This method should never be called in a bug-free game.<a name="line.551"></a>
+<span class="sourceLineNo">552</span>     * &lt;P&gt;<a name="line.552"></a>
+<span class="sourceLineNo">553</span>     * @param array Which boards contents are printed on console<a name="line.553"></a>
+<span class="sourceLineNo">554</span>     */<a name="line.554"></a>
+<span class="sourceLineNo">555</span>    public void print2dArray(int [][] array) {<a name="line.555"></a>
+<span class="sourceLineNo">556</span>        for (int y=0; y&lt;array.length; y++) {<a name="line.556"></a>
+<span class="sourceLineNo">557</span>            for (int x=0; x&lt;array[0].length; x++) {<a name="line.557"></a>
+<span class="sourceLineNo">558</span>                System.out.print("[");<a name="line.558"></a>
+<span class="sourceLineNo">559</span>                System.out.print(Integer.toString(array[y][x]));<a name="line.559"></a>
+<span class="sourceLineNo">560</span>                System.out.print("]");<a name="line.560"></a>
+<span class="sourceLineNo">561</span>            }<a name="line.561"></a>
+<span class="sourceLineNo">562</span>            System.out.println();<a name="line.562"></a>
+<span class="sourceLineNo">563</span>        }<a name="line.563"></a>
+<span class="sourceLineNo">564</span>    }<a name="line.564"></a>
+<span class="sourceLineNo">565</span>    /**<a name="line.565"></a>
+<span class="sourceLineNo">566</span>     * Used for testing. This method should never be called in a bug-free game.<a name="line.566"></a>
+<span class="sourceLineNo">567</span>     * &lt;P&gt;<a name="line.567"></a>
+<span class="sourceLineNo">568</span>     * @param testMessage Message to be shown<a name="line.568"></a>
+<span class="sourceLineNo">569</span>     */<a name="line.569"></a>
+<span class="sourceLineNo">570</span>    public void test(String testMessage) {<a name="line.570"></a>
+<span class="sourceLineNo">571</span>        for (int i=4; i&gt;0; i--) {<a name="line.571"></a>
+<span class="sourceLineNo">572</span>            System.out.println(testMessage);<a name="line.572"></a>
+<span class="sourceLineNo">573</span>        }<a name="line.573"></a>
+<span class="sourceLineNo">574</span>    }<a name="line.574"></a>
+<span class="sourceLineNo">575</span>    /**<a name="line.575"></a>
+<span class="sourceLineNo">576</span>     * Starts a new game. Is called only once during game. In the constructor.<a name="line.576"></a>
+<span class="sourceLineNo">577</span>     */<a name="line.577"></a>
+<span class="sourceLineNo">578</span>    public void startNewGame() {<a name="line.578"></a>
+<span class="sourceLineNo">579</span>        setUpPlayers();<a name="line.579"></a>
+<span class="sourceLineNo">580</span>        while (playerWantsToContinue) {<a name="line.580"></a>
+<span class="sourceLineNo">581</span>            setUpBoard();<a name="line.581"></a>
+<span class="sourceLineNo">582</span>            while (!roundEnded) {<a name="line.582"></a>
+<span class="sourceLineNo">583</span>                startNewTurn();<a name="line.583"></a>
+<span class="sourceLineNo">584</span>            }<a name="line.584"></a>
+<span class="sourceLineNo">585</span>        playerWantsToContinue=Console.readBooleanYorN(("Do you want to start a new game?"));<a name="line.585"></a>
+<span class="sourceLineNo">586</span>        }<a name="line.586"></a>
+<span class="sourceLineNo">587</span>        System.out.println("Have a nice day!");<a name="line.587"></a>
+<span class="sourceLineNo">588</span>        System.exit(0);<a name="line.588"></a>
+<span class="sourceLineNo">589</span>    }<a name="line.589"></a>
+<span class="sourceLineNo">590</span>    /**<a name="line.590"></a>
+<span class="sourceLineNo">591</span>     * Sets up the board that holds the situation of the game.<a name="line.591"></a>
+<span class="sourceLineNo">592</span>     */<a name="line.592"></a>
+<span class="sourceLineNo">593</span>    public void setUpBoard() {<a name="line.593"></a>
+<span class="sourceLineNo">594</span>        board = new char[levelLength][levelLength];<a name="line.594"></a>
+<span class="sourceLineNo">595</span>        emptyTilesLeft=levelLength*levelLength;<a name="line.595"></a>
+<span class="sourceLineNo">596</span><a name="line.596"></a>
+<span class="sourceLineNo">597</span>        roundEnded=false;<a name="line.597"></a>
+<span class="sourceLineNo">598</span>        resetBoard();<a name="line.598"></a>
+<span class="sourceLineNo">599</span>        <a name="line.599"></a>
+<span class="sourceLineNo">600</span>    }<a name="line.600"></a>
+<span class="sourceLineNo">601</span>    /**<a name="line.601"></a>
+<span class="sourceLineNo">602</span>     * Starts a new turn for either human or the computer.<a name="line.602"></a>
+<span class="sourceLineNo">603</span>     */<a name="line.603"></a>
+<span class="sourceLineNo">604</span>    public void startNewTurn() {<a name="line.604"></a>
+<span class="sourceLineNo">605</span>        if (isItHumansTurn) {<a name="line.605"></a>
+<span class="sourceLineNo">606</span>            refreshView();<a name="line.606"></a>
+<span class="sourceLineNo">607</span>            moveToDirection(getDirection());<a name="line.607"></a>
+<span class="sourceLineNo">608</span>        } else {<a name="line.608"></a>
+<span class="sourceLineNo">609</span>            computerPlaysTheirTurn();<a name="line.609"></a>
+<span class="sourceLineNo">610</span>        }<a name="line.610"></a>
+<span class="sourceLineNo">611</span>    }<a name="line.611"></a>
+<span class="sourceLineNo">612</span>    /**<a name="line.612"></a>
+<span class="sourceLineNo">613</span>     * Checks if the tile put in the position of the coordinates brought a win.<a name="line.613"></a>
+<span class="sourceLineNo">614</span>     * &lt;P&gt;<a name="line.614"></a>
+<span class="sourceLineNo">615</span>     * The method is always called 4 times in a row in isThisAwinningMove()<a name="line.615"></a>
+<span class="sourceLineNo">616</span>     * method. Once for each direction, and its opposidte direction at the<a name="line.616"></a>
+<span class="sourceLineNo">617</span>     * same time, since there might be tiles in both of the directions that<a name="line.617"></a>
+<span class="sourceLineNo">618</span>     * give a winning position in a center tile. How many in a row is needed<a name="line.618"></a>
+<span class="sourceLineNo">619</span>     * for win is determined in the variable int targetScore in Game class.<a name="line.619"></a>
+<span class="sourceLineNo">620</span>     * &lt;P&gt;<a name="line.620"></a>
+<span class="sourceLineNo">621</span>     * @param dir Which of the 4 directions check takes place<a name="line.621"></a>
+<span class="sourceLineNo">622</span>     * @param newY Coordinate Y of the center tile of the check<a name="line.622"></a>
+<span class="sourceLineNo">623</span>     * @param newX Coordinate X of the center tile of the check<a name="line.623"></a>
+<span class="sourceLineNo">624</span>     * @return true if there was target score reached in the checks.<a name="line.624"></a>
+<span class="sourceLineNo">625</span>     */<a name="line.625"></a>
+<span class="sourceLineNo">626</span>    public boolean checkVictoryCase(int dir, int newY, int newX) {<a name="line.626"></a>
+<span class="sourceLineNo">627</span>        /*dir (direction) 1 = top-bottom<a name="line.627"></a>
+<span class="sourceLineNo">628</span>                          2 = left-right<a name="line.628"></a>
+<span class="sourceLineNo">629</span>                          3 = topleft-bottomright<a name="line.629"></a>
+<span class="sourceLineNo">630</span>                          4 = topright-bottomleft<a name="line.630"></a>
+<span class="sourceLineNo">631</span>                          */<a name="line.631"></a>
+<span class="sourceLineNo">632</span>        //side determines which type of character the method tries to find more of in a row<a name="line.632"></a>
+<span class="sourceLineNo">633</span>        char side=board[newY][newX];<a name="line.633"></a>
+<span class="sourceLineNo">634</span>        /*posY and posX determine the posiion where the checking takes place. They will keep changing<a name="line.634"></a>
+<span class="sourceLineNo">635</span>        depending on the direction towards the checking takes place*/<a name="line.635"></a>
+<span class="sourceLineNo">636</span>        int posY=newY;<a name="line.636"></a>
+<span class="sourceLineNo">637</span>        int posX=newX;<a name="line.637"></a>
+<span class="sourceLineNo">638</span>        /*dirY and dirX are direction the method will first start going towards, at least one of them<a name="line.638"></a>
+<span class="sourceLineNo">639</span>        will be turned into 1 or -1, before the checking actually starts*/<a name="line.639"></a>
+<span class="sourceLineNo">640</span>        int dirY=0;<a name="line.640"></a>
+<span class="sourceLineNo">641</span>        int dirX=0;<a name="line.641"></a>
+<span class="sourceLineNo">642</span>        /*method will return this boolean. The only way it will turn into true, is if there are<a name="line.642"></a>
+<span class="sourceLineNo">643</span>        number equal to (int targetScore) subsequent tiles occupied by the same (current) player*/<a name="line.643"></a>
+<span class="sourceLineNo">644</span>        boolean victory=false;<a name="line.644"></a>
+<span class="sourceLineNo">645</span>        /*correctTiles means how many tiles it has found already, it will start from 1 since the<a name="line.645"></a>
+<span class="sourceLineNo">646</span>        starting point is always occupied by the current player after just placing the tile there*/<a name="line.646"></a>
+<span class="sourceLineNo">647</span>        int correctTiles=1;<a name="line.647"></a>
+<span class="sourceLineNo">648</span>        <a name="line.648"></a>
+<span class="sourceLineNo">649</span>        /*if the checker doesnt find enough correct tiles from its direction, it will go back to the<a name="line.649"></a>
+<span class="sourceLineNo">650</span>        to the starting position and try to find enough missing ones from the total opposite direction.<a name="line.650"></a>
+<span class="sourceLineNo">651</span>        The reason why it's important to keep check of it, is so the checker will not keep changing<a name="line.651"></a>
+<span class="sourceLineNo">652</span>        directions endlessly.<a name="line.652"></a>
+<span class="sourceLineNo">653</span>        <a name="line.653"></a>
+<span class="sourceLineNo">654</span>        Note, that the word "turn" here doesn't have anything to do with which players<a name="line.654"></a>
+<span class="sourceLineNo">655</span>        turn it is, but instead the turn of the direction as described above.<a name="line.655"></a>
+<span class="sourceLineNo">656</span>        */<a name="line.656"></a>
+<span class="sourceLineNo">657</span>        int turnsLeft=1;<a name="line.657"></a>
+<span class="sourceLineNo">658</span><a name="line.658"></a>
+<span class="sourceLineNo">659</span>        if(dir==1) {<a name="line.659"></a>
+<span class="sourceLineNo">660</span>            dirY=1;<a name="line.660"></a>
+<span class="sourceLineNo">661</span>            dirX=0;<a name="line.661"></a>
+<span class="sourceLineNo">662</span>        } else if(dir==2) {<a name="line.662"></a>
+<span class="sourceLineNo">663</span>            dirY=0;<a name="line.663"></a>
+<span class="sourceLineNo">664</span>            dirX=1;<a name="line.664"></a>
+<span class="sourceLineNo">665</span>        } else if(dir==3) {<a name="line.665"></a>
+<span class="sourceLineNo">666</span>            dirY=1;<a name="line.666"></a>
+<span class="sourceLineNo">667</span>            dirX=1;<a name="line.667"></a>
+<span class="sourceLineNo">668</span>        } else {<a name="line.668"></a>
+<span class="sourceLineNo">669</span>            dirY=1;<a name="line.669"></a>
+<span class="sourceLineNo">670</span>            dirX=-1;<a name="line.670"></a>
+<span class="sourceLineNo">671</span>        }<a name="line.671"></a>
+<span class="sourceLineNo">672</span>        while(correctTiles&lt;=targetScore &amp;&amp; turnsLeft &gt;= 0) {<a name="line.672"></a>
+<span class="sourceLineNo">673</span>            posY+=dirY;<a name="line.673"></a>
+<span class="sourceLineNo">674</span>            posX+=dirX;<a name="line.674"></a>
+<span class="sourceLineNo">675</span>            //we will use try-catch here, since often it would try to check an index out of the board otherwise.<a name="line.675"></a>
+<span class="sourceLineNo">676</span>            try {<a name="line.676"></a>
+<span class="sourceLineNo">677</span>                if (board[posY][posX]==side) {<a name="line.677"></a>
+<span class="sourceLineNo">678</span>                    correctTiles++;<a name="line.678"></a>
+<span class="sourceLineNo">679</span>                    if (correctTiles==targetScore) {<a name="line.679"></a>
+<span class="sourceLineNo">680</span>                        victory=true;<a name="line.680"></a>
+<span class="sourceLineNo">681</span>                    }<a name="line.681"></a>
+<span class="sourceLineNo">682</span>                /*this else-loop will be performed, if there wasn't a correct tile in the current direction<a name="line.682"></a>
+<span class="sourceLineNo">683</span>                   ok copy of code to catch(Exception e), could be used as a new method but would need<a name="line.683"></a>
+<span class="sourceLineNo">684</span>                   all these attributes and parameters for it so I just think this is probably better<a name="line.684"></a>
+<span class="sourceLineNo">685</span>                   to leave as it is */<a name="line.685"></a>
+<span class="sourceLineNo">686</span>                } else {<a name="line.686"></a>
+<span class="sourceLineNo">687</span>                    turnsLeft--;<a name="line.687"></a>
+<span class="sourceLineNo">688</span>                    if (turnsLeft&gt;=0) {<a name="line.688"></a>
+<span class="sourceLineNo">689</span>                        posY=newY;<a name="line.689"></a>
+<span class="sourceLineNo">690</span>                        posX=newX;<a name="line.690"></a>
+<span class="sourceLineNo">691</span>                        dirY=0-dirY;<a name="line.691"></a>
+<span class="sourceLineNo">692</span>                        dirX=0-dirX;<a name="line.692"></a>
+<span class="sourceLineNo">693</span>                    }<a name="line.693"></a>
+<span class="sourceLineNo">694</span>                }<a name="line.694"></a>
+<span class="sourceLineNo">695</span>            /*it will treat the index out of range the same way as if there was a tile occuped by another player<a name="line.695"></a>
+<span class="sourceLineNo">696</span>            there. meaning it will go to starting point and turn back if it hasnt made the turn yet*/<a name="line.696"></a>
+<span class="sourceLineNo">697</span>            } catch (Exception e) {<a name="line.697"></a>
+<span class="sourceLineNo">698</span>                turnsLeft--;<a name="line.698"></a>
+<span class="sourceLineNo">699</span>                if (turnsLeft&gt;=0) {<a name="line.699"></a>
+<span class="sourceLineNo">700</span>                    posY=newY;<a name="line.700"></a>
+<span class="sourceLineNo">701</span>                    posX=newX;<a name="line.701"></a>
+<span class="sourceLineNo">702</span>                    dirY=0-dirY;<a name="line.702"></a>
+<span class="sourceLineNo">703</span>                    dirX=0-dirX;<a name="line.703"></a>
+<span class="sourceLineNo">704</span>                }<a name="line.704"></a>
+<span class="sourceLineNo">705</span>            }<a name="line.705"></a>
+<span class="sourceLineNo">706</span>        }<a name="line.706"></a>
+<span class="sourceLineNo">707</span>        return victory;<a name="line.707"></a>
+<span class="sourceLineNo">708</span>    }<a name="line.708"></a>
+<span class="sourceLineNo">709</span>    /**<a name="line.709"></a>
+<span class="sourceLineNo">710</span>     * Computer makes their move.<a name="line.710"></a>
+<span class="sourceLineNo">711</span>     * &lt;P&gt;<a name="line.711"></a>
+<span class="sourceLineNo">712</span>     * ai.MakeMove() method will always return coordinates that have an empty<a name="line.712"></a>
+<span class="sourceLineNo">713</span>     * tile, so the move will always be valid. Makes the checks if the game<a name="line.713"></a>
+<span class="sourceLineNo">714</span>     * ends after the move is made or if it is the human's turn next.<a name="line.714"></a>
+<span class="sourceLineNo">715</span>     */<a name="line.715"></a>
+<span class="sourceLineNo">716</span>    public void computerPlaysTheirTurn() {<a name="line.716"></a>
+<span class="sourceLineNo">717</span>        <a name="line.717"></a>
+<span class="sourceLineNo">718</span>        int [] aiMoveCoordinates = ai.AiMakeMove();<a name="line.718"></a>
+<span class="sourceLineNo">719</span><a name="line.719"></a>
+<span class="sourceLineNo">720</span>        compY=aiMoveCoordinates[0];<a name="line.720"></a>
+<span class="sourceLineNo">721</span>        compX=aiMoveCoordinates[1];<a name="line.721"></a>
+<span class="sourceLineNo">722</span><a name="line.722"></a>
+<span class="sourceLineNo">723</span>        if (board[compY][compX]==EMPTY) {<a name="line.723"></a>
+<span class="sourceLineNo">724</span>            board[compY][compX]=computer.side();<a name="line.724"></a>
+<span class="sourceLineNo">725</span>            computer.addOccupiedTile();<a name="line.725"></a>
+<span class="sourceLineNo">726</span>            emptyTilesLeft--;<a name="line.726"></a>
+<span class="sourceLineNo">727</span>            infoMessage="Computer put their tile on ["+(compY+1)+","+(compX+1)+"]";<a name="line.727"></a>
+<span class="sourceLineNo">728</span>            if (computer.tilesOccupied() &gt;= targetScore) {<a name="line.728"></a>
+<span class="sourceLineNo">729</span>                checkIfThisPlayerWon();<a name="line.729"></a>
+<span class="sourceLineNo">730</span>            }<a name="line.730"></a>
+<span class="sourceLineNo">731</span>            checkIfDraw();<a name="line.731"></a>
+<span class="sourceLineNo">732</span>            endCurrentPlayersTurn();<a name="line.732"></a>
+<span class="sourceLineNo">733</span>        } else {<a name="line.733"></a>
+<span class="sourceLineNo">734</span>            //just for testing purposes, this should never happen as stated<a name="line.734"></a>
+<span class="sourceLineNo">735</span>            test("ERROR IN CODE. THIS SHOULD HAVE NOT HAPPENED COMPUTER TRIED TO PUT A TILE IN ALREADY OCCUPIED SPACE PROBABLY");<a name="line.735"></a>
+<span class="sourceLineNo">736</span>        }<a name="line.736"></a>
+<span class="sourceLineNo">737</span>    }<a name="line.737"></a>
+<span class="sourceLineNo">738</span>    /**<a name="line.738"></a>
+<span class="sourceLineNo">739</span>     * Asks if user wants to exit the game and stops the program if so.<a name="line.739"></a>
+<span class="sourceLineNo">740</span>     */<a name="line.740"></a>
+<span class="sourceLineNo">741</span>    public void askAboutExit() {<a name="line.741"></a>
+<span class="sourceLineNo">742</span>        boolean answerGiven=false;<a name="line.742"></a>
+<span class="sourceLineNo">743</span>        boolean wantsToExit=false;<a name="line.743"></a>
+<span class="sourceLineNo">744</span>        while (!answerGiven) {<a name="line.744"></a>
+<span class="sourceLineNo">745</span>            wantsToExit = Console.readBooleanYorN("Are you sure you want to exit the game?");<a name="line.745"></a>
+<span class="sourceLineNo">746</span>            if (wantsToExit) {<a name="line.746"></a>
+<span class="sourceLineNo">747</span>                System.exit(0);<a name="line.747"></a>
+<span class="sourceLineNo">748</span>                answerGiven=true;<a name="line.748"></a>
+<span class="sourceLineNo">749</span>            } else {<a name="line.749"></a>
+<span class="sourceLineNo">750</span>                answerGiven=true;<a name="line.750"></a>
+<span class="sourceLineNo">751</span>            }<a name="line.751"></a>
+<span class="sourceLineNo">752</span>        }<a name="line.752"></a>
+<span class="sourceLineNo">753</span>        <a name="line.753"></a>
+<span class="sourceLineNo">754</span>    }<a name="line.754"></a>
+<span class="sourceLineNo">755</span>    /**<a name="line.755"></a>
+<span class="sourceLineNo">756</span>     * Fills the char[][] board with EMPTY characters (empty tiles) etc.<a name="line.756"></a>
+<span class="sourceLineNo">757</span>     * &lt;P&gt;<a name="line.757"></a>
+<span class="sourceLineNo">758</span>     * Is called every time if the player wants to continue after a game has<a name="line.758"></a>
+<span class="sourceLineNo">759</span>     * ended. Determines the starter of the game, resets some info Strings,<a name="line.759"></a>
+<span class="sourceLineNo">760</span>     * and makes the players cursor position to start around center.<a name="line.760"></a>
+<span class="sourceLineNo">761</span>     */<a name="line.761"></a>
+<span class="sourceLineNo">762</span>    public void resetBoard() {<a name="line.762"></a>
+<span class="sourceLineNo">763</span>        for (int y=0; y&lt;board.length; y++) {<a name="line.763"></a>
+<span class="sourceLineNo">764</span>            for (int x=0; x&lt;board[0].length; x++) {<a name="line.764"></a>
+<span class="sourceLineNo">765</span>                board[y][x]=EMPTY;<a name="line.765"></a>
+<span class="sourceLineNo">766</span>            }<a name="line.766"></a>
+<span class="sourceLineNo">767</span>        }<a name="line.767"></a>
+<span class="sourceLineNo">768</span>        <a name="line.768"></a>
+<span class="sourceLineNo">769</span>        curY=levelLength/2;<a name="line.769"></a>
+<span class="sourceLineNo">770</span>        curX=levelLength/2;<a name="line.770"></a>
+<span class="sourceLineNo">771</span><a name="line.771"></a>
+<span class="sourceLineNo">772</span>        //X starts the first game so it's simple to figure out the starter by this. O will start every other game (on evens).<a name="line.772"></a>
+<span class="sourceLineNo">773</span>        if (gamesPlayed % 2 == 0) {<a name="line.773"></a>
+<span class="sourceLineNo">774</span>            isItHumansTurn=isPlayerX;<a name="line.774"></a>
+<span class="sourceLineNo">775</span>        } else {<a name="line.775"></a>
+<span class="sourceLineNo">776</span>            isItHumansTurn=!isPlayerX;<a name="line.776"></a>
+<span class="sourceLineNo">777</span>        }<a name="line.777"></a>
+<span class="sourceLineNo">778</span>        infoMessage="First one to reach "+targetScore+" in a row will win. Good luck!";<a name="line.778"></a>
+<span class="sourceLineNo">779</span>        errorMessage="";<a name="line.779"></a>
+<span class="sourceLineNo">780</span>    }<a name="line.780"></a>
+<span class="sourceLineNo">781</span>    /**<a name="line.781"></a>
+<span class="sourceLineNo">782</span>     * Inner class, that has purpose of determining the computer's next move.<a name="line.782"></a>
+<span class="sourceLineNo">783</span>     */<a name="line.783"></a>
+<span class="sourceLineNo">784</span>    class Ai {<a name="line.784"></a>
+<span class="sourceLineNo">785</span>        /**<a name="line.785"></a>
+<span class="sourceLineNo">786</span>         * "Legacy" variable, not actually used in this version.<a name="line.786"></a>
+<span class="sourceLineNo">787</span>         * &lt;P&gt;<a name="line.787"></a>
+<span class="sourceLineNo">788</span>         * There might be some comments still referring to it so i'm still<a name="line.788"></a>
+<span class="sourceLineNo">789</span>         * leaving it here. Basically its function was to determine the<a name="line.789"></a>
+<span class="sourceLineNo">790</span>         * probablitiy (100 being totally sure as in 100percent) of Ai making<a name="line.790"></a>
+<span class="sourceLineNo">791</span>         * the best possible move it can. Lower difficulty ratings would have<a name="line.791"></a>
+<span class="sourceLineNo">792</span>         * had AiRating lower, where it would make some other move, but I<a name="line.792"></a>
+<span class="sourceLineNo">793</span>         * abandoned the idea haflway cosing the AiMakeMove() method because<a name="line.793"></a>
+<span class="sourceLineNo">794</span>         * the task would have been surprisigly difficult to maintain<a name="line.794"></a>
+<span class="sourceLineNo">795</span>         * throughout the different directions Ai could take their move<a name="line.795"></a>
+<span class="sourceLineNo">796</span>         * towards.<a name="line.796"></a>
+<span class="sourceLineNo">797</span>         */<a name="line.797"></a>
+<span class="sourceLineNo">798</span>        int AiRating=100;<a name="line.798"></a>
+<span class="sourceLineNo">799</span><a name="line.799"></a>
+<span class="sourceLineNo">800</span>        /**<a name="line.800"></a>
+<span class="sourceLineNo">801</span>         * Holds information about human's near victories.<a name="line.801"></a>
+<span class="sourceLineNo">802</span>         * &lt;P&gt;<a name="line.802"></a>
+<span class="sourceLineNo">803</span>         * Identical to the size of char[][] board. Empty tiles that<a name="line.803"></a>
+<span class="sourceLineNo">804</span>         * have victory ahead if 2 more tiles are put, will have a value of 1.<a name="line.804"></a>
+<span class="sourceLineNo">805</span>         * Or more, depending the amount of directions that there will be a<a name="line.805"></a>
+<span class="sourceLineNo">806</span>         * close victory like that. All the other y,x coordinates will hold the<a name="line.806"></a>
+<span class="sourceLineNo">807</span>         * value of 0.<a name="line.807"></a>
+<span class="sourceLineNo">808</span>         */<a name="line.808"></a>
+<span class="sourceLineNo">809</span>        int [][] humanCloseVictoryBoard;<a name="line.809"></a>
+<span class="sourceLineNo">810</span>        /**<a name="line.810"></a>
+<span class="sourceLineNo">811</span>         * Same as humanCloseVictoryBoard but for the computer.<a name="line.811"></a>
+<span class="sourceLineNo">812</span>         */<a name="line.812"></a>
+<span class="sourceLineNo">813</span>        int [][] computerCloseVictoryBoard;<a name="line.813"></a>
+<span class="sourceLineNo">814</span>        /**<a name="line.814"></a>
+<span class="sourceLineNo">815</span>         * Holds information about what tiles Ai thinks are good to occupy.<a name="line.815"></a>
+<span class="sourceLineNo">816</span>         * &lt;P&gt;<a name="line.816"></a>
+<span class="sourceLineNo">817</span>         * Doesn't take into account strategic moves but checks if there is<a name="line.817"></a>
+<span class="sourceLineNo">818</span>         * good spots for enemy's next move. Can be often used mixed with<a name="line.818"></a>
+<span class="sourceLineNo">819</span>         * other boards initiated here, to determine the definitive best move.<a name="line.819"></a>
+<span class="sourceLineNo">820</span>         * The higher the score in the position, the better move Ai thinks it<a name="line.820"></a>
+<span class="sourceLineNo">821</span>         * is. NOTE: As of version 2019-1210 this information is great on 4<a name="line.821"></a>
+<span class="sourceLineNo">822</span>         * and 3 target scored games, but makes computers default moves a bit<a name="line.822"></a>
+<span class="sourceLineNo">823</span>         * worse on higher target scored games. <a name="line.823"></a>
+<span class="sourceLineNo">824</span>         */<a name="line.824"></a>
+<span class="sourceLineNo">825</span>        int [][] priorityCaseBoard;<a name="line.825"></a>
+<span class="sourceLineNo">826</span><a name="line.826"></a>
+<span class="sourceLineNo">827</span>        /**<a name="line.827"></a>
+<span class="sourceLineNo">828</span>         * Gathers information different to other boards initiated here.<a name="line.828"></a>
+<span class="sourceLineNo">829</span>         * &lt;P&gt;<a name="line.829"></a>
+<span class="sourceLineNo">830</span>         * This board was originally created to support the AiRating's full<a name="line.830"></a>
+<span class="sourceLineNo">831</span>         * functionality, where computer might choose some of the next best<a name="line.831"></a>
+<span class="sourceLineNo">832</span>         * moves instead of always the best one. That is why it will hold<a name="line.832"></a>
+<span class="sourceLineNo">833</span>         * the best move that can be made with the value 1, next best move<a name="line.833"></a>
+<span class="sourceLineNo">834</span>         * as 2 and so on. There might not be many numbers on it though,<a name="line.834"></a>
+<span class="sourceLineNo">835</span>         * since now computer just tries to find that 1 definitive move.<a name="line.835"></a>
+<span class="sourceLineNo">836</span>         * 0s in this board would be something that computer don't<a name="line.836"></a>
+<span class="sourceLineNo">837</span>         * consider good moves to pursue at all, except when there is not<a name="line.837"></a>
+<span class="sourceLineNo">838</span>         * even one positive number on board.<a name="line.838"></a>
+<span class="sourceLineNo">839</span>         */<a name="line.839"></a>
+<span class="sourceLineNo">840</span>        int [][] hiPriorityBoard = new int[levelLength][levelLength];<a name="line.840"></a>
+<span class="sourceLineNo">841</span>        /**<a name="line.841"></a>
+<span class="sourceLineNo">842</span>         * Usually the final board that determines the move.<a name="line.842"></a>
+<span class="sourceLineNo">843</span>         * &lt;P&gt;<a name="line.843"></a>
+<span class="sourceLineNo">844</span>         * Holds the information from the mixed results when applying<a name="line.844"></a>
+<span class="sourceLineNo">845</span>         * other boards contents together, based on the priority order in<a name="line.845"></a>
+<span class="sourceLineNo">846</span>         * AiMakeMove() -method.<a name="line.846"></a>
+<span class="sourceLineNo">847</span>         */<a name="line.847"></a>
+<span class="sourceLineNo">848</span>        int [][] modifiedPriorityBoard;<a name="line.848"></a>
+<span class="sourceLineNo">849</span>        /**<a name="line.849"></a>
+<span class="sourceLineNo">850</span>         * Whether computer found one move that is better than others.<a name="line.850"></a>
+<span class="sourceLineNo">851</span>         * &lt;P&gt;<a name="line.851"></a>
+<span class="sourceLineNo">852</span>         * If not, then it will be random generated among the positions that<a name="line.852"></a>
+<span class="sourceLineNo">853</span>         * ai can't decide if one is better than the other.<a name="line.853"></a>
+<span class="sourceLineNo">854</span>         */<a name="line.854"></a>
+<span class="sourceLineNo">855</span>        boolean modifiedPriorityBoardSuccess = false;<a name="line.855"></a>
+<span class="sourceLineNo">856</span>        /**<a name="line.856"></a>
+<span class="sourceLineNo">857</span>         * The default and the only constructor, since AiRating was abandoned.<a name="line.857"></a>
+<span class="sourceLineNo">858</span>         */<a name="line.858"></a>
+<span class="sourceLineNo">859</span>        public Ai() {<a name="line.859"></a>
+<span class="sourceLineNo">860</span>        }<a name="line.860"></a>
+<span class="sourceLineNo">861</span><a name="line.861"></a>
+<span class="sourceLineNo">862</span>        /* IMPORTANT! <a name="line.862"></a>
+<span class="sourceLineNo">863</span>        <a name="line.863"></a>
+<span class="sourceLineNo">864</span>        the method AiMakeMove() was originally planned to have more functionality to have int priorityTarget given as a parameter,<a name="line.864"></a>
+<span class="sourceLineNo">865</span>        when I thought I will implent Ai-Rating (difficulty rating you can choose in the menu before game), and<a name="line.865"></a>
+<span class="sourceLineNo">866</span>        the method could then return some other moves coordinates than the best possible ones. Because of that<a name="line.866"></a>
+<span class="sourceLineNo">867</span>        there is still some code left from this. PriorityCounter, PriorityCounterBeforeNextCheck are these kinds of variables<a name="line.867"></a>
+<span class="sourceLineNo">868</span>        that are not very wise anymore but they will hold this lump of chaos together.<a name="line.868"></a>
+<span class="sourceLineNo">869</span><a name="line.869"></a>
+<span class="sourceLineNo">870</span>        IMPORTANT<a name="line.870"></a>
+<span class="sourceLineNo">871</span><a name="line.871"></a>
+<span class="sourceLineNo">872</span>        Some variables originated from this idea and it could be made simpler by losing those, but I was just happy that I actually got it to work<a name="line.872"></a>
+<span class="sourceLineNo">873</span>        so I don't want to touch it.<a name="line.873"></a>
+<span class="sourceLineNo">874</span><a name="line.874"></a>
+<span class="sourceLineNo">875</span>        What is important that this method will check these cases in this order, and make a move from the first of the priorities they can reach:<a name="line.875"></a>
+<span class="sourceLineNo">876</span><a name="line.876"></a>
+<span class="sourceLineNo">877</span>        - FIRST PRIORITY MOVE (INSTANT WIN FOR COMPUTER):<a name="line.877"></a>
+<span class="sourceLineNo">878</span>          instant win for the computer. They will put a tile in this winning position.<a name="line.878"></a>
+<span class="sourceLineNo">879</span><a name="line.879"></a>
+<span class="sourceLineNo">880</span>        - SECOND PRIORITY MOVE (BLOCKING HUMANS NEXT TURNS WIN):<a name="line.880"></a>
+<span class="sourceLineNo">881</span>          there is no possibility for computer win right now, but there is one for human, so computer will put his own tile<a name="line.881"></a>
+<span class="sourceLineNo">882</span>          in this place instead. If there is more than one of these places, then he can (and will) stop only one of them. Again, if multiple places like this,<a name="line.882"></a>
+<span class="sourceLineNo">883</span>          Ai will choose a tile that will help him win the game easier on his next turns, or if there are multiple but none of them will help computer have a<a name="line.883"></a>
+<span class="sourceLineNo">884</span>          future win more than the other, then the tile from those few will be chosen at random.<a name="line.884"></a>
+<span class="sourceLineNo">885</span><a name="line.885"></a>
+<span class="sourceLineNo">886</span>        - THIRD PRIORITY MOVE: (OFFENSIVE MOVE, 2 TILES FROM COMPUTER VICTORY)<a name="line.886"></a>
+<span class="sourceLineNo">887</span>          No instant wins upcoming for either player, but if there is a move that will help computer win AFTER putting one other tile, then computer will<a name="line.887"></a>
+<span class="sourceLineNo">888</span>          push to do this. If there is a place that has more that holds more than 1 upcoming victory, they will put a tile in there and should win soon after<a name="line.888"></a>
+<span class="sourceLineNo">889</span>          that. If not, Computer will check if they can stop humans "close victory case" like this with the same<a name="line.889"></a>
+<span class="sourceLineNo">890</span>          move and proceeds to do a move like that. If they can stop more than 1 directions of humans victory, they will do the one with the biggest<a name="line.890"></a>
+<span class="sourceLineNo">891</span>          possibilities. If there is not a humans future case to be blocked but there are multiple "close victory cases" for computer, they will choose the<a name="line.891"></a>
+<span class="sourceLineNo">892</span>          one that computer thinks is the best according to "Priority Case Board". If they think none of them are better than the other, they will randomize<a name="line.892"></a>
+<span class="sourceLineNo">893</span>          one.<a name="line.893"></a>
+<span class="sourceLineNo">894</span><a name="line.894"></a>
+<span class="sourceLineNo">895</span>        - FOURTH PRIORITY MOVE: (DEFENSIVE MOVE, BLOCKING HUMAN'S VICTORY THAT IS 2 TILES AWAY)<a name="line.895"></a>
+<span class="sourceLineNo">896</span>          No instant win moves for either player, and not even 2 tiles away victory for computer, but there is one or more cases like that for human.<a name="line.896"></a>
+<span class="sourceLineNo">897</span>          Again, will try to make a move that will block as many human close victories as possible, if there is more than 1 cases in the tiles. Other<a name="line.897"></a>
+<span class="sourceLineNo">898</span>          than that, tries to put the defensive move in as good place as possible as determined in the "priority case board". If they come back<a name="line.898"></a>
+<span class="sourceLineNo">899</span>          equal, it will be randomized.<a name="line.899"></a>
+<span class="sourceLineNo">900</span><a name="line.900"></a>
+<span class="sourceLineNo">901</span>          FIFTH PRIORITY MOVE: (DEFAULT MOVE)<a name="line.901"></a>
+<span class="sourceLineNo">902</span>          None of the cases listed above apply, so will try to build a victory from some central position, as found in priority case board. It will<a name="line.902"></a>
+<span class="sourceLineNo">903</span>          most likely be randomized among many potential tiles, depending on the size and the progression on the board. If there are some other computers<a name="line.903"></a>
+<span class="sourceLineNo">904</span>          tiles already on the board, that have potential to lead to victory, victory case board should find tiles to build up to that.<a name="line.904"></a>
+<span class="sourceLineNo">905</span><a name="line.905"></a>
+<span class="sourceLineNo">906</span>          NOTE: changes in the priority board can tweak this default move to be different if needed. Changes in it will also change some of the other<a name="line.906"></a>
+<span class="sourceLineNo">907</span>          moves if they have multiple potential moves.<a name="line.907"></a>
+<span class="sourceLineNo">908</span><a name="line.908"></a>
+<span class="sourceLineNo">909</span>        <a name="line.909"></a>
+<span class="sourceLineNo">910</span>        <a name="line.910"></a>
+<span class="sourceLineNo">911</span>        the method void AiMakeMove() will put possible moves in order of how wise they would be to perform.*/<a name="line.911"></a>
+<span class="sourceLineNo">912</span>        <a name="line.912"></a>
+<span class="sourceLineNo">913</span>        /**<a name="line.913"></a>
+<span class="sourceLineNo">914</span>         * Determines the computers next move's coordinates.<a name="line.914"></a>
+<span class="sourceLineNo">915</span>         * &lt;P&gt;<a name="line.915"></a>
+<span class="sourceLineNo">916</span>         * There is lot of information in the java codes comments. Never<a name="line.916"></a>
+<span class="sourceLineNo">917</span>         * returns coordinates that do not hold an empty tile.<a name="line.917"></a>
+<span class="sourceLineNo">918</span>         * &lt;P&gt;<a name="line.918"></a>
+<span class="sourceLineNo">919</span>         * @return coordinates as int[]{y,x} array that computer's next move<a name="line.919"></a>
+<span class="sourceLineNo">920</span>         * is gonna take place in.<a name="line.920"></a>
+<span class="sourceLineNo">921</span>         */<a name="line.921"></a>
+<span class="sourceLineNo">922</span>        public int[] AiMakeMove() {<a name="line.922"></a>
+<span class="sourceLineNo">923</span><a name="line.923"></a>
+<span class="sourceLineNo">924</span>            /*later in the method these 3 arrays will be initalized if needed.<a name="line.924"></a>
+<span class="sourceLineNo">925</span>            */<a name="line.925"></a>
+<span class="sourceLineNo">926</span>            /*humanCloseVictoryBoard will hold information about tiles that would give human a victory a round after if they would put a tile<a name="line.926"></a>
+<span class="sourceLineNo">927</span>            in that position. If the index position is 0, this tile is not suitable for that. If it's 1, it will have possibility to do that for 1<a name="line.927"></a>
+<span class="sourceLineNo">928</span>            direction, if 2, then in 2 directions etc<a name="line.928"></a>
+<span class="sourceLineNo">929</span>            */<a name="line.929"></a>
+<span class="sourceLineNo">930</span>            humanCloseVictoryBoard = new int[levelLength][levelLength];<a name="line.930"></a>
+<span class="sourceLineNo">931</span>            //computerCloseVictoryBoard will hold the same information about the computers possible victories that are close to obtain<a name="line.931"></a>
+<span class="sourceLineNo">932</span>            computerCloseVictoryBoard = new int[levelLength][levelLength];<a name="line.932"></a>
+<span class="sourceLineNo">933</span>            /*this will try to mimic the best possible places on the board but it will notice a winning or a good defending/offending move on its own.<a name="line.933"></a>
+<span class="sourceLineNo">934</span>            That's why It can be used in addition to closeVictoryBoards. This will hold much bigger scores, but that doesn't mean the computer is going<a name="line.934"></a>
+<span class="sourceLineNo">935</span>            to make a move that has a highest score, if it finds out there are victories to be stopped, proceeded or instant victories possible*/<a name="line.935"></a>
+<span class="sourceLineNo">936</span>            priorityCaseBoard = new int[levelLength][levelLength];<a name="line.936"></a>
+<span class="sourceLineNo">937</span><a name="line.937"></a>
+<span class="sourceLineNo">938</span>            modifiedPriorityBoardSuccess = false;<a name="line.938"></a>
+<span class="sourceLineNo">939</span><a name="line.939"></a>
+<span class="sourceLineNo">940</span>            /* int[][] hiPriorityBoard has similar size that the actual game board (char[][] board), but instead of<a name="line.940"></a>
+<span class="sourceLineNo">941</span>            occupied and empty tiles, it will hold information about the best possible moves AI could make, where<a name="line.941"></a>
+<span class="sourceLineNo">942</span>            1 is the best, and each number after that (2, 3, 4 etc) is the next best possible move. priorityCounter<a name="line.942"></a>
+<span class="sourceLineNo">943</span>            will hold information about that.<a name="line.943"></a>
+<span class="sourceLineNo">944</span><a name="line.944"></a>
+<span class="sourceLineNo">945</span>            IMPORTANT<a name="line.945"></a>
+<span class="sourceLineNo">946</span>            It will not actually do this for all possible moves (see the Important comment above this method)<a name="line.946"></a>
+<span class="sourceLineNo">947</span>            <a name="line.947"></a>
+<span class="sourceLineNo">948</span>            */<a name="line.948"></a>
+<span class="sourceLineNo">949</span>            hiPriorityBoard = new int[levelLength][levelLength];<a name="line.949"></a>
+<span class="sourceLineNo">950</span>            // modifiedPriorityBoard will hold info about hiPriorityBoard and CloseVictoryBoards and/or PriorityCaseBoards combined, if needed<a name="line.950"></a>
+<span class="sourceLineNo">951</span>            modifiedPriorityBoard = new int[levelLength][levelLength];<a name="line.951"></a>
+<span class="sourceLineNo">952</span><a name="line.952"></a>
+<span class="sourceLineNo">953</span>            //IMPORTANT These 2 variables will not do what theiy're supposed to for whole method, but they are needed for the top parts<a name="line.953"></a>
+<span class="sourceLineNo">954</span>            int priorityCounter=0;<a name="line.954"></a>
+<span class="sourceLineNo">955</span>            int priorityCounterBeforeNextCheck = 0;<a name="line.955"></a>
+<span class="sourceLineNo">956</span>            /*method is designed to stop searching for best possible tiles, after priorityCounter hits a score equal to the<a name="line.956"></a>
+<span class="sourceLineNo">957</span>            priorityTarget given as parameter.<a name="line.957"></a>
+<span class="sourceLineNo">958</span>            That means that if there was 4 empty tiles (emptyTiles==4) in the game when it's computer's turn and this method<a name="line.958"></a>
+<span class="sourceLineNo">959</span>            is executed, numbers 1, 2, 3 and 4 will be added to the indexes found by method AiMakeMove()<a name="line.959"></a>
+<span class="sourceLineNo">960</span>            */<a name="line.960"></a>
+<span class="sourceLineNo">961</span><a name="line.961"></a>
+<span class="sourceLineNo">962</span>            /*first priority: Will check if there are empty tiles to choose that would give computer the win immediately.<a name="line.962"></a>
+<span class="sourceLineNo">963</span>            But there is no need to do the check if there are not enough tiles placed for it to be even possible.<a name="line.963"></a>
+<span class="sourceLineNo">964</span>            */<a name="line.964"></a>
+<span class="sourceLineNo">965</span>            if (computer.tilesOccupied() &gt;= (targetScore-1) ) {<a name="line.965"></a>
+<span class="sourceLineNo">966</span>                for (int y=0; y&lt;board.length; y++) {<a name="line.966"></a>
+<span class="sourceLineNo">967</span>                    for (int x=0; x&lt;board[0].length; x++) {<a name="line.967"></a>
+<span class="sourceLineNo">968</span>                        /*for each tile that is empty, we will (temporiraly) place computers tile and then we will<a name="line.968"></a>
+<span class="sourceLineNo">969</span>                        check if they would win with a move like that using a part of code from checkIfThisPlayerWon() method,<a name="line.969"></a>
+<span class="sourceLineNo">970</span>                        which I made a method of its own called boolean isThisAWinningMove(...).<a name="line.970"></a>
+<span class="sourceLineNo">971</span>                        */<a name="line.971"></a>
+<span class="sourceLineNo">972</span>                        if (board[y][x]==EMPTY) {<a name="line.972"></a>
+<span class="sourceLineNo">973</span>                            board[y][x]=computer.side();<a name="line.973"></a>
+<span class="sourceLineNo">974</span>                            if (isThisAwinningMove(y, x)) {<a name="line.974"></a>
+<span class="sourceLineNo">975</span>                                board[y][x]=EMPTY;<a name="line.975"></a>
+<span class="sourceLineNo">976</span>                                int [] moveToMake = new int[]{y,x};<a name="line.976"></a>
+<span class="sourceLineNo">977</span>                                return moveToMake;<a name="line.977"></a>
+<span class="sourceLineNo">978</span>                            }<a name="line.978"></a>
+<span class="sourceLineNo">979</span>                        /*it is important to change it back to EMPTY right afterwards, since this move hasn't actually<a name="line.979"></a>
+<span class="sourceLineNo">980</span>                        been made just yet*/<a name="line.980"></a>
+<span class="sourceLineNo">981</span>                        board[y][x]=EMPTY;<a name="line.981"></a>
+<span class="sourceLineNo">982</span><a name="line.982"></a>
+<span class="sourceLineNo">983</span>                        }<a name="line.983"></a>
+<span class="sourceLineNo">984</span>                    }<a name="line.984"></a>
+<span class="sourceLineNo">985</span>                }<a name="line.985"></a>
+<span class="sourceLineNo">986</span>            }<a name="line.986"></a>
+<span class="sourceLineNo">987</span><a name="line.987"></a>
+<span class="sourceLineNo">988</span>            //if we found the move AI is going to make already, no need to check the rest of the cases.<a name="line.988"></a>
+<span class="sourceLineNo">989</span>            <a name="line.989"></a>
+<span class="sourceLineNo">990</span>            //we will put 1 in it since AIRating functionality was not implemented in the final version<a name="line.990"></a>
+<span class="sourceLineNo">991</span>            int coordinates[]=(coordinatesOfPriorityNo(1));<a name="line.991"></a>
+<span class="sourceLineNo">992</span>            if (coordinates[0] != -1 &amp;&amp; coordinates[1] != -1) {<a name="line.992"></a>
+<span class="sourceLineNo">993</span>                return coordinates;<a name="line.993"></a>
+<span class="sourceLineNo">994</span>            }<a name="line.994"></a>
+<span class="sourceLineNo">995</span><a name="line.995"></a>
+<span class="sourceLineNo">996</span>            /*SECOND PRIORITY: (DEFENSIVE MOVE): Will check if there is a move, that would allow human player to win the game on their next turn, if<a name="line.996"></a>
+<span class="sourceLineNo">997</span>            computer doesn't put a tile in that exact place now to prevent that.<a name="line.997"></a>
+<span class="sourceLineNo">998</span><a name="line.998"></a>
+<span class="sourceLineNo">999</span>            */<a name="line.999"></a>
+<span class="sourceLineNo">1000</span>            if ( human.tilesOccupied() &gt;= (targetScore-1)) {<a name="line.1000"></a>
+<span class="sourceLineNo">1001</span>                for (int y=0; y&lt;board.length; y++) {<a name="line.1001"></a>
+<span class="sourceLineNo">1002</span>                    for (int x=0; x&lt;board[0].length; x++) {<a name="line.1002"></a>
+<span class="sourceLineNo">1003</span>                        /*for each tile that is empty, we will (temporiraly) place computers tile and then we will<a name="line.1003"></a>
+<span class="sourceLineNo">1004</span>                        check if they would win with a move like that using a part of code from checkIfThisPlayerWon() method,<a name="line.1004"></a>
+<span class="sourceLineNo">1005</span>                        which I made a method of its own called boolean isThisAWinningMove(...).<a name="line.1005"></a>
+<span class="sourceLineNo">1006</span>                        */<a name="line.1006"></a>
+<span class="sourceLineNo">1007</span>                        if (board[y][x]==EMPTY) {<a name="line.1007"></a>
+<span class="sourceLineNo">1008</span>                            board[y][x]=human.side();<a name="line.1008"></a>
+<span class="sourceLineNo">1009</span>                            if (isThisAwinningMove(y, x)) {<a name="line.1009"></a>
+<span class="sourceLineNo">1010</span>                                hiPriorityBoard[y][x]=++priorityCounter;<a name="line.1010"></a>
+<span class="sourceLineNo">1011</span>                            }<a name="line.1011"></a>
+<span class="sourceLineNo">1012</span>                        /*it is important to change it back to EMPTY right afterwards, since this move hasn't actually<a name="line.1012"></a>
+<span class="sourceLineNo">1013</span>                        been made*/<a name="line.1013"></a>
+<span class="sourceLineNo">1014</span>                        board[y][x]=EMPTY;<a name="line.1014"></a>
+<span class="sourceLineNo">1015</span><a name="line.1015"></a>
+<span class="sourceLineNo">1016</span>                        }<a name="line.1016"></a>
+<span class="sourceLineNo">1017</span>                    }<a name="line.1017"></a>
+<span class="sourceLineNo">1018</span>                }<a name="line.1018"></a>
+<span class="sourceLineNo">1019</span><a name="line.1019"></a>
+<span class="sourceLineNo">1020</span>            }<a name="line.1020"></a>
+<span class="sourceLineNo">1021</span>            //we will check again if ai has found a move he's going to make, but in this case we need to look further which one<a name="line.1021"></a>
+<span class="sourceLineNo">1022</span>            //is actually the best move, and not just the first one that the for-loops found<a name="line.1022"></a>
+<span class="sourceLineNo">1023</span>            coordinates=(coordinatesOfPriorityNo(1));<a name="line.1023"></a>
+<span class="sourceLineNo">1024</span>            if (coordinates[0] != -1 &amp;&amp; coordinates[1] != -1) {<a name="line.1024"></a>
+<span class="sourceLineNo">1025</span>                //in this case we don't need to check further, there is only one option here<a name="line.1025"></a>
+<span class="sourceLineNo">1026</span>                if (priorityCounter == 1) {<a name="line.1026"></a>
+<span class="sourceLineNo">1027</span>                    return coordinates;<a name="line.1027"></a>
+<span class="sourceLineNo">1028</span>                } else {<a name="line.1028"></a>
+<span class="sourceLineNo">1029</span><a name="line.1029"></a>
+<span class="sourceLineNo">1030</span>                    /*This else-loop will be performed if there are more than 1 possible move to do from "second priority" case.<a name="line.1030"></a>
+<span class="sourceLineNo">1031</span>                    It will try to determine which one is the best. if best is not found, it will randomize one of them.*/<a name="line.1031"></a>
+<span class="sourceLineNo">1032</span><a name="line.1032"></a>
+<span class="sourceLineNo">1033</span>                    //-1,-1 are just for testing purposes, and it should never really return those if working properly<a name="line.1033"></a>
+<span class="sourceLineNo">1034</span>                    int [] moveToMake=new int[]{-1, -1};<a name="line.1034"></a>
+<span class="sourceLineNo">1035</span><a name="line.1035"></a>
+<span class="sourceLineNo">1036</span>                    buildCloseBoards();<a name="line.1036"></a>
+<span class="sourceLineNo">1037</span>                    buildPriorityCaseBoard();<a name="line.1037"></a>
+<span class="sourceLineNo">1038</span><a name="line.1038"></a>
+<span class="sourceLineNo">1039</span>                    if (areThereNonZeroes(computerCloseVictoryBoard)) {<a name="line.1039"></a>
+<span class="sourceLineNo">1040</span>                        modifiedPriorityBoard = applyAnotherBoard(hiPriorityBoard, computerCloseVictoryBoard);<a name="line.1040"></a>
+<span class="sourceLineNo">1041</span>                    }<a name="line.1041"></a>
+<span class="sourceLineNo">1042</span><a name="line.1042"></a>
+<span class="sourceLineNo">1043</span>                    //we will continue to do more checks if the right move wasnt found yet<a name="line.1043"></a>
+<span class="sourceLineNo">1044</span>                    if (!modifiedPriorityBoardSuccess) {<a name="line.1044"></a>
+<span class="sourceLineNo">1045</span>                        if (areThereNonZeroes(humanCloseVictoryBoard)) {<a name="line.1045"></a>
+<span class="sourceLineNo">1046</span>                            modifiedPriorityBoard = applyAnotherBoard(modifiedPriorityBoard, humanCloseVictoryBoard);<a name="line.1046"></a>
+<span class="sourceLineNo">1047</span>                        }<a name="line.1047"></a>
+<span class="sourceLineNo">1048</span>                    }<a name="line.1048"></a>
+<span class="sourceLineNo">1049</span>                    if (!modifiedPriorityBoardSuccess) {<a name="line.1049"></a>
+<span class="sourceLineNo">1050</span>                        modifiedPriorityBoard = applyAnotherBoard(modifiedPriorityBoard, priorityCaseBoard);<a name="line.1050"></a>
+<span class="sourceLineNo">1051</span>                    }<a name="line.1051"></a>
+<span class="sourceLineNo">1052</span>                    if (!modifiedPriorityBoardSuccess) {<a name="line.1052"></a>
+<span class="sourceLineNo">1053</span>                        //changed to hiPriorityBoard so it won't crash (rarely) for some reason<a name="line.1053"></a>
+<span class="sourceLineNo">1054</span>                        /* IMPORTANT THIS ISN'T IDEAL THAT I HAD TO DO THIS, since in a case like this it will ignore<a name="line.1054"></a>
+<span class="sourceLineNo">1055</span>                        couple of those last used boards, so it might end up putting a tile in almost-the-best-but-not-quite<a name="line.1055"></a>
+<span class="sourceLineNo">1056</span>                        the best move that AI would otherwise find, but it should be quite rare case. */<a name="line.1056"></a>
+<span class="sourceLineNo">1057</span>                        moveToMake = getCoordinatesOfRandomMove(hiPriorityBoard);<a name="line.1057"></a>
+<span class="sourceLineNo">1058</span>                    }<a name="line.1058"></a>
+<span class="sourceLineNo">1059</span>                    if (modifiedPriorityBoardSuccess) {<a name="line.1059"></a>
+<span class="sourceLineNo">1060</span>                        System.out.println();<a name="line.1060"></a>
+<span class="sourceLineNo">1061</span>                        print2dArray(modifiedPriorityBoard);<a name="line.1061"></a>
+<span class="sourceLineNo">1062</span>                        System.out.println();<a name="line.1062"></a>
+<span class="sourceLineNo">1063</span>                        moveToMake=getCoordinates(modifiedPriorityBoard);<a name="line.1063"></a>
+<span class="sourceLineNo">1064</span>                    }<a name="line.1064"></a>
+<span class="sourceLineNo">1065</span>                    return moveToMake;<a name="line.1065"></a>
+<span class="sourceLineNo">1066</span>                }<a name="line.1066"></a>
+<span class="sourceLineNo">1067</span>            }<a name="line.1067"></a>
+<span class="sourceLineNo">1068</span>            /* THIRD PRIORITY (OFFENSIVE MOVE): if there is something in the computers close victory board, this is something that he wants to do next,<a name="line.1068"></a>
+<span class="sourceLineNo">1069</span>            because<a name="line.1069"></a>
+<span class="sourceLineNo">1070</span>                - there have not been found winning move for either player, then after this move, human is forced to be in a situation where<a name="line.1070"></a>
+<span class="sourceLineNo">1071</span>                computer will have a guaranteed win unless they can be stopped by placing a tile in a winning position.<a name="line.1071"></a>
+<span class="sourceLineNo">1072</span>            */<a name="line.1072"></a>
+<span class="sourceLineNo">1073</span>            buildCloseBoards();<a name="line.1073"></a>
+<span class="sourceLineNo">1074</span>            buildPriorityCaseBoard();<a name="line.1074"></a>
+<span class="sourceLineNo">1075</span>            if (areThereNonZeroes(computerCloseVictoryBoard)) {<a name="line.1075"></a>
+<span class="sourceLineNo">1076</span>                int [] moveToMake=new int[]{-1, -1};<a name="line.1076"></a>
+<span class="sourceLineNo">1077</span>                //hiPriorityBoard is empty right now, but we will fill it to have its possible moves from computerCloseVictoryBoard<a name="line.1077"></a>
+<span class="sourceLineNo">1078</span>                hiPriorityBoard=computerCloseVictoryBoard;<a name="line.1078"></a>
+<span class="sourceLineNo">1079</span>                /*working as intended even though may look ridicolous. This time we know:<a name="line.1079"></a>
+<span class="sourceLineNo">1080</span>                    - there is the next move to make found, but only way we can know which one it is, if there was only one value<a name="line.1080"></a>
+<span class="sourceLineNo">1081</span>                    that was higher than the others. (on a sidenote: <a name="line.1081"></a>
+<span class="sourceLineNo">1082</span>                    if there was at least one that was higher than 1, computer is going to win this game<a name="line.1082"></a>
+<span class="sourceLineNo">1083</span>                    in their next turn)<a name="line.1083"></a>
+<span class="sourceLineNo">1084</span>                */<a name="line.1084"></a>
+<span class="sourceLineNo">1085</span>                modifiedPriorityBoard = applyAnotherBoard(hiPriorityBoard, computerCloseVictoryBoard);<a name="line.1085"></a>
+<span class="sourceLineNo">1086</span>                if (!modifiedPriorityBoardSuccess) {<a name="line.1086"></a>
+<span class="sourceLineNo">1087</span>                    /* in this case we don't know yet which is the best move to make, so we will check if one of the moves<a name="line.1087"></a>
+<span class="sourceLineNo">1088</span>                    would block humans possible future victories best */<a name="line.1088"></a>
+<span class="sourceLineNo">1089</span>                    <a name="line.1089"></a>
+<span class="sourceLineNo">1090</span>                    if (areThereNonZeroes(humanCloseVictoryBoard)) {<a name="line.1090"></a>
+<span class="sourceLineNo">1091</span>                        modifiedPriorityBoard = applyAnotherBoard(modifiedPriorityBoard, humanCloseVictoryBoard);<a name="line.1091"></a>
+<span class="sourceLineNo">1092</span>                    }<a name="line.1092"></a>
+<span class="sourceLineNo">1093</span>                }<a name="line.1093"></a>
+<span class="sourceLineNo">1094</span>                if (!modifiedPriorityBoardSuccess) {<a name="line.1094"></a>
+<span class="sourceLineNo">1095</span>                    modifiedPriorityBoard = applyAnotherBoard(modifiedPriorityBoard, priorityCaseBoard);<a name="line.1095"></a>
+<span class="sourceLineNo">1096</span>                }<a name="line.1096"></a>
+<span class="sourceLineNo">1097</span>                if (!modifiedPriorityBoardSuccess) {<a name="line.1097"></a>
+<span class="sourceLineNo">1098</span>                    moveToMake = getCoordinatesOfRandomMove(modifiedPriorityBoard);<a name="line.1098"></a>
+<span class="sourceLineNo">1099</span>                }<a name="line.1099"></a>
+<span class="sourceLineNo">1100</span>                if (modifiedPriorityBoardSuccess) {<a name="line.1100"></a>
+<span class="sourceLineNo">1101</span>                    moveToMake=getCoordinates(modifiedPriorityBoard);<a name="line.1101"></a>
+<span class="sourceLineNo">1102</span>                }<a name="line.1102"></a>
+<span class="sourceLineNo">1103</span>                return moveToMake;<a name="line.1103"></a>
+<span class="sourceLineNo">1104</span>            }<a name="line.1104"></a>
+<span class="sourceLineNo">1105</span><a name="line.1105"></a>
+<span class="sourceLineNo">1106</span>            /* FOURTH-PRIORITY (DEFENSIVE MOVE AGAINST UPCOMING HUMAN VICTORY)<a name="line.1106"></a>
+<span class="sourceLineNo">1107</span><a name="line.1107"></a>
+<span class="sourceLineNo">1108</span>            In this case<a name="line.1108"></a>
+<span class="sourceLineNo">1109</span>            - there was no victory to be made or stopped for either player<a name="line.1109"></a>
+<span class="sourceLineNo">1110</span>            - Computer didnt have a move where he could force human in the defensive move or lose the round after<a name="line.1110"></a>
+<span class="sourceLineNo">1111</span>            - but there is still a move human could pursue to win the game a turn after, so it's wise for computer to stop<a name="line.1111"></a>
+<span class="sourceLineNo">1112</span>            it before it happens, since computer can't push offensively to win before that happens, as in third-priority case above<a name="line.1112"></a>
+<span class="sourceLineNo">1113</span><a name="line.1113"></a>
+<span class="sourceLineNo">1114</span>            */<a name="line.1114"></a>
+<span class="sourceLineNo">1115</span><a name="line.1115"></a>
+<span class="sourceLineNo">1116</span>            if (areThereNonZeroes(humanCloseVictoryBoard)) {<a name="line.1116"></a>
+<span class="sourceLineNo">1117</span><a name="line.1117"></a>
+<span class="sourceLineNo">1118</span>                int [] moveToMake=new int[]{-1, -1};<a name="line.1118"></a>
+<span class="sourceLineNo">1119</span><a name="line.1119"></a>
+<span class="sourceLineNo">1120</span>                hiPriorityBoard=humanCloseVictoryBoard;<a name="line.1120"></a>
+<span class="sourceLineNo">1121</span><a name="line.1121"></a>
+<span class="sourceLineNo">1122</span>                modifiedPriorityBoard = applyAnotherBoard(hiPriorityBoard, humanCloseVictoryBoard);<a name="line.1122"></a>
+<span class="sourceLineNo">1123</span><a name="line.1123"></a>
+<span class="sourceLineNo">1124</span>                if (!modifiedPriorityBoardSuccess) {<a name="line.1124"></a>
+<span class="sourceLineNo">1125</span>                    modifiedPriorityBoard = applyAnotherBoard(modifiedPriorityBoard, priorityCaseBoard);<a name="line.1125"></a>
+<span class="sourceLineNo">1126</span>                }<a name="line.1126"></a>
+<span class="sourceLineNo">1127</span>                if (!modifiedPriorityBoardSuccess) {<a name="line.1127"></a>
+<span class="sourceLineNo">1128</span>                    moveToMake = getCoordinatesOfRandomMove(modifiedPriorityBoard);<a name="line.1128"></a>
+<span class="sourceLineNo">1129</span>                }<a name="line.1129"></a>
+<span class="sourceLineNo">1130</span>        <a name="line.1130"></a>
+<span class="sourceLineNo">1131</span>                if (modifiedPriorityBoardSuccess) {<a name="line.1131"></a>
+<span class="sourceLineNo">1132</span>                    moveToMake=getCoordinates(modifiedPriorityBoard);<a name="line.1132"></a>
+<span class="sourceLineNo">1133</span>                }<a name="line.1133"></a>
+<span class="sourceLineNo">1134</span><a name="line.1134"></a>
+<span class="sourceLineNo">1135</span>                return moveToMake;<a name="line.1135"></a>
+<span class="sourceLineNo">1136</span>            }<a name="line.1136"></a>
+<span class="sourceLineNo">1137</span><a name="line.1137"></a>
+<span class="sourceLineNo">1138</span>            /*FIFTH-PRIORITY: default move to make: there was no victory or even close victory possible for either player, so time to find the<a name="line.1138"></a>
+<span class="sourceLineNo">1139</span>            move as good as possible otherwise */<a name="line.1139"></a>
+<span class="sourceLineNo">1140</span><a name="line.1140"></a>
+<span class="sourceLineNo">1141</span>            int [] moveToMake=new int[]{-1, -1};<a name="line.1141"></a>
+<span class="sourceLineNo">1142</span><a name="line.1142"></a>
+<span class="sourceLineNo">1143</span>            hiPriorityBoard=priorityCaseBoard;<a name="line.1143"></a>
+<span class="sourceLineNo">1144</span>            modifiedPriorityBoard = applyAnotherBoard(hiPriorityBoard, priorityCaseBoard);<a name="line.1144"></a>
+<span class="sourceLineNo">1145</span><a name="line.1145"></a>
+<span class="sourceLineNo">1146</span>            if (!modifiedPriorityBoardSuccess) {<a name="line.1146"></a>
+<span class="sourceLineNo">1147</span>                moveToMake = getCoordinatesOfRandomMove(modifiedPriorityBoard);<a name="line.1147"></a>
+<span class="sourceLineNo">1148</span>            }<a name="line.1148"></a>
+<span class="sourceLineNo">1149</span><a name="line.1149"></a>
+<span class="sourceLineNo">1150</span>            if (modifiedPriorityBoardSuccess) {<a name="line.1150"></a>
+<span class="sourceLineNo">1151</span>                moveToMake=getCoordinates(modifiedPriorityBoard);<a name="line.1151"></a>
+<span class="sourceLineNo">1152</span>            }<a name="line.1152"></a>
+<span class="sourceLineNo">1153</span><a name="line.1153"></a>
+<span class="sourceLineNo">1154</span>            return moveToMake;<a name="line.1154"></a>
+<span class="sourceLineNo">1155</span>            <a name="line.1155"></a>
+<span class="sourceLineNo">1156</span>        }<a name="line.1156"></a>
+<span class="sourceLineNo">1157</span><a name="line.1157"></a>
+<span class="sourceLineNo">1158</span>        /**<a name="line.1158"></a>
+<span class="sourceLineNo">1159</span>         * Mixes an existing "Ai"-board, like HiPriorityBoard with another one.<a name="line.1159"></a>
+<span class="sourceLineNo">1160</span>         * &lt;P&gt;<a name="line.1160"></a>
+<span class="sourceLineNo">1161</span>         * Applies changes to first board (boardToModify) based on the values<a name="line.1161"></a>
+<span class="sourceLineNo">1162</span>         * in the second bord (cvBoard). If there are no mutual coordinates in<a name="line.1162"></a>
+<span class="sourceLineNo">1163</span>         * both boards, the boardToModify remains unchanged. If there are<a name="line.1163"></a>
+<span class="sourceLineNo">1164</span>         * multiple values in the second player that have higher rating than<a name="line.1164"></a>
+<span class="sourceLineNo">1165</span>         * all the other mutual coordinates, only they will remain in the<a name="line.1165"></a>
+<span class="sourceLineNo">1166</span>         * board that is returned, and all other values will be 0. If there<a name="line.1166"></a>
+<span class="sourceLineNo">1167</span>         * is only one mutual tile left, it will be the move the Ai is going<a name="line.1167"></a>
+<span class="sourceLineNo">1168</span>         * to make.<a name="line.1168"></a>
+<span class="sourceLineNo">1169</span>         * &lt;P&gt;<a name="line.1169"></a>
+<span class="sourceLineNo">1170</span>         * @param boardToModify board that determines the possible coordinates<a name="line.1170"></a>
+<span class="sourceLineNo">1171</span>         * @param cvBoard the board that is applied on to boardToModify<a name="line.1171"></a>
+<span class="sourceLineNo">1172</span>         * @return board that has the changes made to boardToModify.<a name="line.1172"></a>
+<span class="sourceLineNo">1173</span>         */<a name="line.1173"></a>
+<span class="sourceLineNo">1174</span>        public int[][] applyAnotherBoard (int[][] boardToModify, int[][] cvBoard) {<a name="line.1174"></a>
+<span class="sourceLineNo">1175</span><a name="line.1175"></a>
+<span class="sourceLineNo">1176</span>            int highestVictoryScore=0;<a name="line.1176"></a>
+<span class="sourceLineNo">1177</span>            int noOfHighestVictoryScores=0;<a name="line.1177"></a>
+<span class="sourceLineNo">1178</span>    <a name="line.1178"></a>
+<span class="sourceLineNo">1179</span>            int[][] newBoard = new int[levelLength][levelLength];<a name="line.1179"></a>
+<span class="sourceLineNo">1180</span>    <a name="line.1180"></a>
+<span class="sourceLineNo">1181</span>            for (int y=0; y&lt;board.length; y++) {<a name="line.1181"></a>
+<span class="sourceLineNo">1182</span>                for (int x = 0; x&lt;board[0].length; x++) {<a name="line.1182"></a>
+<span class="sourceLineNo">1183</span>                    if ((boardToModify[y][x] &gt; 0) &amp;&amp; (cvBoard[y][x] &gt; 0)) {<a name="line.1183"></a>
+<span class="sourceLineNo">1184</span>                        newBoard[y][x]=cvBoard[y][x];<a name="line.1184"></a>
+<span class="sourceLineNo">1185</span>                        if (cvBoard[y][x] &gt; highestVictoryScore) {<a name="line.1185"></a>
+<span class="sourceLineNo">1186</span>                            highestVictoryScore=cvBoard[y][x];<a name="line.1186"></a>
+<span class="sourceLineNo">1187</span>                            noOfHighestVictoryScores=1;<a name="line.1187"></a>
+<span class="sourceLineNo">1188</span>                        } else if (cvBoard[y][x] == highestVictoryScore) {<a name="line.1188"></a>
+<span class="sourceLineNo">1189</span>                            noOfHighestVictoryScores++;<a name="line.1189"></a>
+<span class="sourceLineNo">1190</span>                        } else {<a name="line.1190"></a>
+<span class="sourceLineNo">1191</span>                            newBoard[y][x]=0;<a name="line.1191"></a>
+<span class="sourceLineNo">1192</span>                        }<a name="line.1192"></a>
+<span class="sourceLineNo">1193</span>                    }<a name="line.1193"></a>
+<span class="sourceLineNo">1194</span>                }<a name="line.1194"></a>
+<span class="sourceLineNo">1195</span>            }<a name="line.1195"></a>
+<span class="sourceLineNo">1196</span>            // multiple possible cases remain, but lower scores (worse moves) might be filtered out<a name="line.1196"></a>
+<span class="sourceLineNo">1197</span>            if (noOfHighestVictoryScores &gt; 1) {<a name="line.1197"></a>
+<span class="sourceLineNo">1198</span>                for (int y=0; y &lt; board.length; y++) {<a name="line.1198"></a>
+<span class="sourceLineNo">1199</span>                    for (int x = 0; x &lt; board[0].length; x++) {<a name="line.1199"></a>
+<span class="sourceLineNo">1200</span>                        if (newBoard[y][x] != highestVictoryScore) {<a name="line.1200"></a>
+<span class="sourceLineNo">1201</span>                            newBoard[y][x] = 0;<a name="line.1201"></a>
+<span class="sourceLineNo">1202</span>                        }<a name="line.1202"></a>
+<span class="sourceLineNo">1203</span>                    }<a name="line.1203"></a>
+<span class="sourceLineNo">1204</span>                }<a name="line.1204"></a>
+<span class="sourceLineNo">1205</span>            } else if (noOfHighestVictoryScores == 1) {<a name="line.1205"></a>
+<span class="sourceLineNo">1206</span>                // here they found the move they are going to make<a name="line.1206"></a>
+<span class="sourceLineNo">1207</span>                for (int y=0; y &lt; board.length; y++) {<a name="line.1207"></a>
+<span class="sourceLineNo">1208</span>                    for (int x = 0; x &lt; board[0].length; x++) {<a name="line.1208"></a>
+<span class="sourceLineNo">1209</span>                        if (newBoard[y][x] != highestVictoryScore) {<a name="line.1209"></a>
+<span class="sourceLineNo">1210</span>                            newBoard[y][x] = 0;<a name="line.1210"></a>
+<span class="sourceLineNo">1211</span>                        }<a name="line.1211"></a>
+<span class="sourceLineNo">1212</span>                    }<a name="line.1212"></a>
+<span class="sourceLineNo">1213</span>                }<a name="line.1213"></a>
+<span class="sourceLineNo">1214</span>                modifiedPriorityBoardSuccess=true;<a name="line.1214"></a>
+<span class="sourceLineNo">1215</span>            } else {<a name="line.1215"></a>
+<span class="sourceLineNo">1216</span>                //didnt find any matches so the method didnt really change the board and find out other than this fact<a name="line.1216"></a>
+<span class="sourceLineNo">1217</span>                newBoard = boardToModify;<a name="line.1217"></a>
+<span class="sourceLineNo">1218</span>            }<a name="line.1218"></a>
+<span class="sourceLineNo">1219</span>            return newBoard;<a name="line.1219"></a>
+<span class="sourceLineNo">1220</span>        }<a name="line.1220"></a>
+<span class="sourceLineNo">1221</span>        /**<a name="line.1221"></a>
+<span class="sourceLineNo">1222</span>         * Fills up humanCloseVictoryBoard and computerCloseVictoryBoard.<a name="line.1222"></a>
+<span class="sourceLineNo">1223</span>         * &lt;P&gt;<a name="line.1223"></a>
+<span class="sourceLineNo">1224</span>         * More info on these variables that are initiated in Ai class.<a name="line.1224"></a>
+<span class="sourceLineNo">1225</span>         */<a name="line.1225"></a>
+<span class="sourceLineNo">1226</span>        public void buildCloseBoards() {<a name="line.1226"></a>
+<span class="sourceLineNo">1227</span><a name="line.1227"></a>
+<span class="sourceLineNo">1228</span>            for (int y=0; y&lt;board.length; y++) {<a name="line.1228"></a>
+<span class="sourceLineNo">1229</span>                for (int x=0; x&lt;board[0].length; x++) {<a name="line.1229"></a>
+<span class="sourceLineNo">1230</span>                    if (board[y][x] == EMPTY) {<a name="line.1230"></a>
+<span class="sourceLineNo">1231</span>                        computerCloseVictoryBoard[y][x]=toHowManyDirectionsIsThisMoveCloseToAwinningMove(computer.side(), y, x);<a name="line.1231"></a>
+<span class="sourceLineNo">1232</span>                        humanCloseVictoryBoard[y][x]=toHowManyDirectionsIsThisMoveCloseToAwinningMove(human.side(), y, x);<a name="line.1232"></a>
+<span class="sourceLineNo">1233</span>                    }<a name="line.1233"></a>
+<span class="sourceLineNo">1234</span>                }<a name="line.1234"></a>
+<span class="sourceLineNo">1235</span>            }<a name="line.1235"></a>
+<span class="sourceLineNo">1236</span>        }<a name="line.1236"></a>
+<span class="sourceLineNo">1237</span>        /**<a name="line.1237"></a>
+<span class="sourceLineNo">1238</span>         * Fills up priorityCaseBoard.<a name="line.1238"></a>
+<span class="sourceLineNo">1239</span>         * &lt;P&gt;<a name="line.1239"></a>
+<span class="sourceLineNo">1240</span>         * More info on Ai Class where the array is initiated.<a name="line.1240"></a>
+<span class="sourceLineNo">1241</span>         */<a name="line.1241"></a>
+<span class="sourceLineNo">1242</span>        public void buildPriorityCaseBoard() {<a name="line.1242"></a>
+<span class="sourceLineNo">1243</span>            for (int y=0; y&lt;board.length; y++) {<a name="line.1243"></a>
+<span class="sourceLineNo">1244</span>                for (int x=0; x&lt;board[0].length; x++) {<a name="line.1244"></a>
+<span class="sourceLineNo">1245</span>                    if (board[y][x] == EMPTY) {<a name="line.1245"></a>
+<span class="sourceLineNo">1246</span>                        priorityCaseBoard[y][x]=priorityCaseScore(y, x);<a name="line.1246"></a>
+<span class="sourceLineNo">1247</span>                    }<a name="line.1247"></a>
+<span class="sourceLineNo">1248</span>                }<a name="line.1248"></a>
+<span class="sourceLineNo">1249</span>            }<a name="line.1249"></a>
+<span class="sourceLineNo">1250</span>        }<a name="line.1250"></a>
+<span class="sourceLineNo">1251</span>        /**<a name="line.1251"></a>
+<span class="sourceLineNo">1252</span>         * Returns the coordiantes of the only possible move Ai thinks is best.<a name="line.1252"></a>
+<span class="sourceLineNo">1253</span>         * &lt;P&gt;<a name="line.1253"></a>
+<span class="sourceLineNo">1254</span>         * Method should only take a board that has only one coordinate left on<a name="line.1254"></a>
+<span class="sourceLineNo">1255</span>         * it. If there are multiple, getCoordiantesOfRandomMove(int [][])<a name="line.1255"></a>
+<span class="sourceLineNo">1256</span>         * should be used instead.<a name="line.1256"></a>
+<span class="sourceLineNo">1257</span>         * &lt;P&gt;<a name="line.1257"></a>
+<span class="sourceLineNo">1258</span>         * @param coBoard ModifiedPriorityBoard with only one value other than<a name="line.1258"></a>
+<span class="sourceLineNo">1259</span>         * 0.<a name="line.1259"></a>
+<span class="sourceLineNo">1260</span>         * @return int[]{y,x} coordinates of the next move<a name="line.1260"></a>
+<span class="sourceLineNo">1261</span>         */<a name="line.1261"></a>
+<span class="sourceLineNo">1262</span>        public int[] getCoordinates(int [][] coBoard) {<a name="line.1262"></a>
+<span class="sourceLineNo">1263</span>            //this method should only be used for a board that has only 1 index that is non-zero<a name="line.1263"></a>
+<span class="sourceLineNo">1264</span>            //just to make sure this method isnt doing any mistakes, we are doing counter<a name="line.1264"></a>
+<span class="sourceLineNo">1265</span>            int counter=0;<a name="line.1265"></a>
+<span class="sourceLineNo">1266</span><a name="line.1266"></a>
+<span class="sourceLineNo">1267</span>            //we will reset the coordinates with impossible values just for testing purposes<a name="line.1267"></a>
+<span class="sourceLineNo">1268</span>            int[] coordinates = new int[] {-1,-1};<a name="line.1268"></a>
+<span class="sourceLineNo">1269</span><a name="line.1269"></a>
+<span class="sourceLineNo">1270</span>            for (int y=0; y &lt; board.length; y++) {<a name="line.1270"></a>
+<span class="sourceLineNo">1271</span>                for (int x = 0; x &lt; board[0].length; x++) {<a name="line.1271"></a>
+<span class="sourceLineNo">1272</span>                    if (coBoard[y][x] &gt; 0) {<a name="line.1272"></a>
+<span class="sourceLineNo">1273</span>                        counter++;<a name="line.1273"></a>
+<span class="sourceLineNo">1274</span>                        coordinates[0]=y;<a name="line.1274"></a>
+<span class="sourceLineNo">1275</span>                        coordinates[1]=x;<a name="line.1275"></a>
+<span class="sourceLineNo">1276</span>                        //again just for testing purposes, this should never happen<a name="line.1276"></a>
+<span class="sourceLineNo">1277</span>                        if (counter &gt; 1) {<a name="line.1277"></a>
+<span class="sourceLineNo">1278</span>                            System.out.println("this happened there was more than 1 actually ERROR, see next board");<a name="line.1278"></a>
+<span class="sourceLineNo">1279</span>                            print2dArray(coBoard);<a name="line.1279"></a>
+<span class="sourceLineNo">1280</span>                            System.out.println();<a name="line.1280"></a>
+<span class="sourceLineNo">1281</span>                            coordinates[0]=-1;<a name="line.1281"></a>
+<span class="sourceLineNo">1282</span>                            coordinates[1]=-1;<a name="line.1282"></a>
+<span class="sourceLineNo">1283</span>                        }<a name="line.1283"></a>
+<span class="sourceLineNo">1284</span>                    }<a name="line.1284"></a>
+<span class="sourceLineNo">1285</span>                }<a name="line.1285"></a>
+<span class="sourceLineNo">1286</span>            }<a name="line.1286"></a>
+<span class="sourceLineNo">1287</span>            return coordinates;<a name="line.1287"></a>
+<span class="sourceLineNo">1288</span>        }<a name="line.1288"></a>
+<span class="sourceLineNo">1289</span>        /**<a name="line.1289"></a>
+<span class="sourceLineNo">1290</span>         * Returns one random moves coordinates based on options in param board<a name="line.1290"></a>
+<span class="sourceLineNo">1291</span>         * &lt;P&gt;<a name="line.1291"></a>
+<span class="sourceLineNo">1292</span>         * This method should used on a board that has multiple indexes that<a name="line.1292"></a>
+<span class="sourceLineNo">1293</span>         * are other than 0. It has equal chance to choose any one of those<a name="line.1293"></a>
+<span class="sourceLineNo">1294</span>         * options.<a name="line.1294"></a>
+<span class="sourceLineNo">1295</span>         * &lt;P&gt;<a name="line.1295"></a>
+<span class="sourceLineNo">1296</span>         * @param raBoard modifiedPriorityBoard or hiPriorityBoard<a name="line.1296"></a>
+<span class="sourceLineNo">1297</span>         * @return int[]{y,x} coordinates of next move<a name="line.1297"></a>
+<span class="sourceLineNo">1298</span>         */<a name="line.1298"></a>
+<span class="sourceLineNo">1299</span>        public int[] getCoordinatesOfRandomMove(int [][] raBoard) {<a name="line.1299"></a>
+<span class="sourceLineNo">1300</span>            //we will reset the coordinates with impossible values just for testing purposes<a name="line.1300"></a>
+<span class="sourceLineNo">1301</span>            int[] coordinates = new int[] {-1,-1};<a name="line.1301"></a>
+<span class="sourceLineNo">1302</span>            //first we will go through the board to know how many possibilities we have, since not using ArrayList here<a name="line.1302"></a>
+<span class="sourceLineNo">1303</span>            int possibilities=0;<a name="line.1303"></a>
+<span class="sourceLineNo">1304</span>            for (int y=0; y&lt;board.length; y++) {<a name="line.1304"></a>
+<span class="sourceLineNo">1305</span>                for (int x = 0; x&lt;board[0].length; x++) {<a name="line.1305"></a>
+<span class="sourceLineNo">1306</span>                    if (raBoard[y][x] &gt; 0) {<a name="line.1306"></a>
+<span class="sourceLineNo">1307</span>                        possibilities++;<a name="line.1307"></a>
+<span class="sourceLineNo">1308</span>                    }<a name="line.1308"></a>
+<span class="sourceLineNo">1309</span>                }<a name="line.1309"></a>
+<span class="sourceLineNo">1310</span>            }<a name="line.1310"></a>
+<span class="sourceLineNo">1311</span>            int random = Math.getRandom(1,possibilities);<a name="line.1311"></a>
+<span class="sourceLineNo">1312</span>            possibilities=0;<a name="line.1312"></a>
+<span class="sourceLineNo">1313</span>            for (int y=0; y&lt;board.length; y++) {<a name="line.1313"></a>
+<span class="sourceLineNo">1314</span>                for (int x = 0; x&lt;board[0].length; x++) {<a name="line.1314"></a>
+<span class="sourceLineNo">1315</span>                    if (raBoard[y][x] &gt; 0) {<a name="line.1315"></a>
+<span class="sourceLineNo">1316</span>                        possibilities++;<a name="line.1316"></a>
+<span class="sourceLineNo">1317</span>                        if (random==possibilities) {<a name="line.1317"></a>
+<span class="sourceLineNo">1318</span>                            coordinates[0]=y;<a name="line.1318"></a>
+<span class="sourceLineNo">1319</span>                            coordinates[1]=x;<a name="line.1319"></a>
+<span class="sourceLineNo">1320</span>                            return coordinates;<a name="line.1320"></a>
+<span class="sourceLineNo">1321</span>                        }<a name="line.1321"></a>
+<span class="sourceLineNo">1322</span>                    }<a name="line.1322"></a>
+<span class="sourceLineNo">1323</span>                }<a name="line.1323"></a>
+<span class="sourceLineNo">1324</span>            }<a name="line.1324"></a>
+<span class="sourceLineNo">1325</span>            return coordinates;<a name="line.1325"></a>
+<span class="sourceLineNo">1326</span>        }<a name="line.1326"></a>
+<span class="sourceLineNo">1327</span>        /**<a name="line.1327"></a>
+<span class="sourceLineNo">1328</span>         * Returns an integer that is added in the coordinates in priorityBoard<a name="line.1328"></a>
+<span class="sourceLineNo">1329</span>         * &lt;P&gt;<a name="line.1329"></a>
+<span class="sourceLineNo">1330</span>         * All 4 directions are actually always added to the score.<a name="line.1330"></a>
+<span class="sourceLineNo">1331</span>         * NOTE: this method's scores could be edited to abtain better<a name="line.1331"></a>
+<span class="sourceLineNo">1332</span>         * Ai for the program. Maybe it could be added to have different types<a name="line.1332"></a>
+<span class="sourceLineNo">1333</span>         * of calculating the score, since right now, as in version 2019-1012<a name="line.1333"></a>
+<span class="sourceLineNo">1334</span>         * it is best used in games that have 4 or 3 tiles as their target<a name="line.1334"></a>
+<span class="sourceLineNo">1335</span>         * score. This is because it doesn't manage to favor building a high<a name="line.1335"></a>
+<span class="sourceLineNo">1336</span>         * number of tiles in a row as easily as putting them all chunked up<a name="line.1336"></a>
+<span class="sourceLineNo">1337</span>         * in one center place next to the other. Only then closeVictoryBoard<a name="line.1337"></a>
+<span class="sourceLineNo">1338</span>         * check will force Ai to start making more offensive moves.<a name="line.1338"></a>
+<span class="sourceLineNo">1339</span>         * &lt;P&gt;<a name="line.1339"></a>
+<span class="sourceLineNo">1340</span>         * @param newY Y-coordinates of the tile whose score is calculated<a name="line.1340"></a>
+<span class="sourceLineNo">1341</span>         * @param newX X-coordinates of the tile whose score is calculated<a name="line.1341"></a>
+<span class="sourceLineNo">1342</span>         * @return score based on how good Ai thinks the move is based on one<a name="line.1342"></a>
+<span class="sourceLineNo">1343</span>         * of the four directions, and their opposite directions.<a name="line.1343"></a>
+<span class="sourceLineNo">1344</span>         */<a name="line.1344"></a>
+<span class="sourceLineNo">1345</span>        public int priorityCaseScore (int newY, int newX) {<a name="line.1345"></a>
+<span class="sourceLineNo">1346</span>            int score=0;<a name="line.1346"></a>
+<span class="sourceLineNo">1347</span>            for (int i = 1; i &lt;= 4; i++) {<a name="line.1347"></a>
+<span class="sourceLineNo">1348</span>                score += priorityCaseScoreDirection(i, newY, newX);<a name="line.1348"></a>
+<span class="sourceLineNo">1349</span>            }<a name="line.1349"></a>
+<span class="sourceLineNo">1350</span>            return score;<a name="line.1350"></a>
+<span class="sourceLineNo">1351</span>        }<a name="line.1351"></a>
+<span class="sourceLineNo">1352</span><a name="line.1352"></a>
+<span class="sourceLineNo">1353</span>        /* IMPORTANT the following method can have its score__ variables tweaked to easily make the AI different<a name="line.1353"></a>
+<span class="sourceLineNo">1354</span><a name="line.1354"></a>
+<span class="sourceLineNo">1355</span>        /*the method will return integer. The higher the integer, the better it would be for computer to<a name="line.1355"></a>
+<span class="sourceLineNo">1356</span>        occupy the tile in these coordinates given as parameters. The first parameter determines which one<a name="line.1356"></a>
+<span class="sourceLineNo">1357</span>        of the 4 directions this score is based on. Then again, the method will always be called for all 4<a name="line.1357"></a>
+<span class="sourceLineNo">1358</span>        directions in a row, but it's better to keep them still separeted, and added to the score after one another.<a name="line.1358"></a>
+<span class="sourceLineNo">1359</span>        <a name="line.1359"></a>
+<span class="sourceLineNo">1360</span>        NOTE: we will never have to add any score for center tile, because that tile is determined here, it is<a name="line.1360"></a>
+<span class="sourceLineNo">1361</span>        always empty. this method should never be used on a tile that is not empty.<a name="line.1361"></a>
+<span class="sourceLineNo">1362</span>        */<a name="line.1362"></a>
+<span class="sourceLineNo">1363</span>        public int priorityCaseScoreDirection(int dir, int newY, int newX) {<a name="line.1363"></a>
+<span class="sourceLineNo">1364</span>    <a name="line.1364"></a>
+<span class="sourceLineNo">1365</span>            //to be returned<a name="line.1365"></a>
+<span class="sourceLineNo">1366</span>            int score=0;<a name="line.1366"></a>
+<span class="sourceLineNo">1367</span>    <a name="line.1367"></a>
+<span class="sourceLineNo">1368</span>            /*this counter goes down to 1 when the first edge or enemy tile is reached, and then again when it does<a name="line.1368"></a>
+<span class="sourceLineNo">1369</span>            the same in the opposite direction */<a name="line.1369"></a>
+<span class="sourceLineNo">1370</span>            int endOfRoutesLeft=2;<a name="line.1370"></a>
+<span class="sourceLineNo">1371</span>            <a name="line.1371"></a>
+<span class="sourceLineNo">1372</span>            /*the method could be tweaked to help player as well, but we don't plan to show this kind of help<a name="line.1372"></a>
+<span class="sourceLineNo">1373</span>            to player to ruin the fun, so we will just check it always for computer's side of things.<a name="line.1373"></a>
+<span class="sourceLineNo">1374</span><a name="line.1374"></a>
+<span class="sourceLineNo">1375</span>            Post-Note: Actually best possible score would be the one that in case of equals, it would also be among humans best scores, but<a name="line.1375"></a>
+<span class="sourceLineNo">1376</span>            that would make things even more complex so I won't do it at least yet<a name="line.1376"></a>
+<span class="sourceLineNo">1377</span>            */<a name="line.1377"></a>
+<span class="sourceLineNo">1378</span>            char side=computer.side();<a name="line.1378"></a>
+<span class="sourceLineNo">1379</span>            /*ok we have to be careful there, enemySide means human in this case since we're writing this method<a name="line.1379"></a>
+<span class="sourceLineNo">1380</span>            to try to help ai make good move*/<a name="line.1380"></a>
+<span class="sourceLineNo">1381</span>            char enemySide=human.side();<a name="line.1381"></a>
+<span class="sourceLineNo">1382</span>            <a name="line.1382"></a>
+<span class="sourceLineNo">1383</span>            int scoreForOwnTile = 13;<a name="line.1383"></a>
+<span class="sourceLineNo">1384</span>            int scoreForEmptyTile = 2;<a name="line.1384"></a>
+<span class="sourceLineNo">1385</span>            int scoreForEnemyTile = 1;<a name="line.1385"></a>
+<span class="sourceLineNo">1386</span>            int scoreForEdge = 0;<a name="line.1386"></a>
+<span class="sourceLineNo">1387</span>    <a name="line.1387"></a>
+<span class="sourceLineNo">1388</span>            /*a little bonus but it shouldnt be too big so AI won't end up putting the tile always next to each other<a name="line.1388"></a>
+<span class="sourceLineNo">1389</span>            even if there is no future (possiblity to reach target score) in that place in many (if any) directions*/<a name="line.1389"></a>
+<span class="sourceLineNo">1390</span>            int scoreForOwnNearbyTile = 1;<a name="line.1390"></a>
+<span class="sourceLineNo">1391</span>            <a name="line.1391"></a>
+<span class="sourceLineNo">1392</span>            /*should be major bonus but it can't be too big so Ai won't think central position in all directions is always better than<a name="line.1392"></a>
+<span class="sourceLineNo">1393</span>            continuing a case that has some of its directions blocked but lots of tiles in some direction<a name="line.1393"></a>
+<span class="sourceLineNo">1394</span>            */<a name="line.1394"></a>
+<span class="sourceLineNo">1395</span>            int scoreForTargetScore = 7;<a name="line.1395"></a>
+<span class="sourceLineNo">1396</span>            int scoreForExceedingTargetScore = 3;<a name="line.1396"></a>
+<span class="sourceLineNo">1397</span>    <a name="line.1397"></a>
+<span class="sourceLineNo">1398</span>            int counterForTargetScore = 0;<a name="line.1398"></a>
+<span class="sourceLineNo">1399</span>            //also if the targetScore is lower there is very little point in putting a tile there so lots of penalty<a name="line.1399"></a>
+<span class="sourceLineNo">1400</span>    <a name="line.1400"></a>
+<span class="sourceLineNo">1401</span>            //this must be reseted after the turn<a name="line.1401"></a>
+<span class="sourceLineNo">1402</span>            int distanceFromCenter = 1;<a name="line.1402"></a>
+<span class="sourceLineNo">1403</span><a name="line.1403"></a>
+<span class="sourceLineNo">1404</span>            int posY=newY;<a name="line.1404"></a>
+<span class="sourceLineNo">1405</span>            int posX=newX;<a name="line.1405"></a>
+<span class="sourceLineNo">1406</span>    <a name="line.1406"></a>
+<span class="sourceLineNo">1407</span>            int dirY=0;<a name="line.1407"></a>
+<span class="sourceLineNo">1408</span>            int dirX=0;<a name="line.1408"></a>
+<span class="sourceLineNo">1409</span>    <a name="line.1409"></a>
+<span class="sourceLineNo">1410</span>            if(dir==1) {<a name="line.1410"></a>
+<span class="sourceLineNo">1411</span>                dirY=1;<a name="line.1411"></a>
+<span class="sourceLineNo">1412</span>                dirX=0;<a name="line.1412"></a>
+<span class="sourceLineNo">1413</span>            } else if(dir==2) {<a name="line.1413"></a>
+<span class="sourceLineNo">1414</span>                dirY=0;<a name="line.1414"></a>
+<span class="sourceLineNo">1415</span>                dirX=1;<a name="line.1415"></a>
+<span class="sourceLineNo">1416</span>            } else if(dir==3) {<a name="line.1416"></a>
+<span class="sourceLineNo">1417</span>                dirY=1;<a name="line.1417"></a>
+<span class="sourceLineNo">1418</span>                dirX=1;<a name="line.1418"></a>
+<span class="sourceLineNo">1419</span>            } else {<a name="line.1419"></a>
+<span class="sourceLineNo">1420</span>                dirY=1;<a name="line.1420"></a>
+<span class="sourceLineNo">1421</span>                dirX=-1;<a name="line.1421"></a>
+<span class="sourceLineNo">1422</span>            }<a name="line.1422"></a>
+<span class="sourceLineNo">1423</span>            while(endOfRoutesLeft &gt; 0  &amp;&amp; distanceFromCenter &lt;= targetScore) {<a name="line.1423"></a>
+<span class="sourceLineNo">1424</span>                posY+=dirY;<a name="line.1424"></a>
+<span class="sourceLineNo">1425</span>                posX+=dirX;<a name="line.1425"></a>
+<span class="sourceLineNo">1426</span>    <a name="line.1426"></a>
+<span class="sourceLineNo">1427</span>                /*we will use try-catch here, since it's important to know how close we are to the edge<a name="line.1427"></a>
+<span class="sourceLineNo">1428</span>                (index out of range that is) in case edge is closer in that direction than a tile<a name="line.1428"></a>
+<span class="sourceLineNo">1429</span>                occupied by the human.*/<a name="line.1429"></a>
+<span class="sourceLineNo">1430</span>                try {<a name="line.1430"></a>
+<span class="sourceLineNo">1431</span>                    if (board[posY][posX]==side) {<a name="line.1431"></a>
+<span class="sourceLineNo">1432</span>                        //coutneFortargetScore goes up by 1 point, distance must be added in the end so it won't end the loop yet<a name="line.1432"></a>
+<span class="sourceLineNo">1433</span>                        counterForTargetScore++;<a name="line.1433"></a>
+<span class="sourceLineNo">1434</span>                        //always happening<a name="line.1434"></a>
+<span class="sourceLineNo">1435</span>                        score += scoreForOwnTile;<a name="line.1435"></a>
+<span class="sourceLineNo">1436</span>                        /*if counter reaches target score, the move is going to be something that has potential<a name="line.1436"></a>
+<span class="sourceLineNo">1437</span>                        to lead to a victory. Also each tile after that is a bonus too since it gives extra potential */<a name="line.1437"></a>
+<span class="sourceLineNo">1438</span>                        if(counterForTargetScore == targetScore) {<a name="line.1438"></a>
+<span class="sourceLineNo">1439</span>                            score += scoreForTargetScore;<a name="line.1439"></a>
+<span class="sourceLineNo">1440</span>                        } else if (counterForTargetScore &gt; targetScore) {<a name="line.1440"></a>
+<span class="sourceLineNo">1441</span>                            score += scoreForExceedingTargetScore;<a name="line.1441"></a>
+<span class="sourceLineNo">1442</span>                        }<a name="line.1442"></a>
+<span class="sourceLineNo">1443</span>                        distanceFromCenter++;<a name="line.1443"></a>
+<span class="sourceLineNo">1444</span>                        //special bonus case<a name="line.1444"></a>
+<span class="sourceLineNo">1445</span>                        if(distanceFromCenter==1) {<a name="line.1445"></a>
+<span class="sourceLineNo">1446</span>                            score += scoreForOwnNearbyTile;<a name="line.1446"></a>
+<span class="sourceLineNo">1447</span>                        } else if (distanceFromCenter == targetScore) {<a name="line.1447"></a>
+<span class="sourceLineNo">1448</span>                            endOfRoutesLeft--;<a name="line.1448"></a>
+<span class="sourceLineNo">1449</span>                            if (endOfRoutesLeft &gt; 0) {<a name="line.1449"></a>
+<span class="sourceLineNo">1450</span>                                distanceFromCenter=1;<a name="line.1450"></a>
+<span class="sourceLineNo">1451</span>                                posY=newY;<a name="line.1451"></a>
+<span class="sourceLineNo">1452</span>                                posX=newX;<a name="line.1452"></a>
+<span class="sourceLineNo">1453</span>                                dirY=0-dirY;<a name="line.1453"></a>
+<span class="sourceLineNo">1454</span>                                dirX=0-dirX;<a name="line.1454"></a>
+<span class="sourceLineNo">1455</span>                            }<a name="line.1455"></a>
+<span class="sourceLineNo">1456</span>                        }<a name="line.1456"></a>
+<span class="sourceLineNo">1457</span>                } else if (board[posY][posX]==EMPTY) {<a name="line.1457"></a>
+<span class="sourceLineNo">1458</span>                    counterForTargetScore++;<a name="line.1458"></a>
+<span class="sourceLineNo">1459</span>                    score += scoreForEmptyTile;<a name="line.1459"></a>
+<span class="sourceLineNo">1460</span>                    /*if counter reaches target score, the move is going to be something that has potential<a name="line.1460"></a>
+<span class="sourceLineNo">1461</span>                        to lead to a victory. Also each tile after that is a bonus too since it gives extra potential */<a name="line.1461"></a>
+<span class="sourceLineNo">1462</span>                    if(counterForTargetScore == targetScore) {<a name="line.1462"></a>
+<span class="sourceLineNo">1463</span>                        score += scoreForTargetScore;<a name="line.1463"></a>
+<span class="sourceLineNo">1464</span>                    } else if (counterForTargetScore &gt; targetScore) {<a name="line.1464"></a>
+<span class="sourceLineNo">1465</span>                        score += scoreForExceedingTargetScore;<a name="line.1465"></a>
+<span class="sourceLineNo">1466</span>                    }<a name="line.1466"></a>
+<span class="sourceLineNo">1467</span>                    distanceFromCenter++;<a name="line.1467"></a>
+<span class="sourceLineNo">1468</span>                    if (distanceFromCenter == targetScore) {<a name="line.1468"></a>
+<span class="sourceLineNo">1469</span>                        endOfRoutesLeft--;<a name="line.1469"></a>
+<span class="sourceLineNo">1470</span>                        if (endOfRoutesLeft &gt; 0) {<a name="line.1470"></a>
+<span class="sourceLineNo">1471</span>                            distanceFromCenter=1;<a name="line.1471"></a>
+<span class="sourceLineNo">1472</span>                            posY=newY;<a name="line.1472"></a>
+<span class="sourceLineNo">1473</span>                            posX=newX;<a name="line.1473"></a>
+<span class="sourceLineNo">1474</span>                            dirY=0-dirY;<a name="line.1474"></a>
+<span class="sourceLineNo">1475</span>                            dirX=0-dirX;<a name="line.1475"></a>
+<span class="sourceLineNo">1476</span>                        }<a name="line.1476"></a>
+<span class="sourceLineNo">1477</span>                    }<a name="line.1477"></a>
+<span class="sourceLineNo">1478</span>                //this is the case of opposingSides tile<a name="line.1478"></a>
+<span class="sourceLineNo">1479</span>                } else {<a name="line.1479"></a>
+<span class="sourceLineNo">1480</span>                    score += scoreForEnemyTile;<a name="line.1480"></a>
+<span class="sourceLineNo">1481</span>                    endOfRoutesLeft--;<a name="line.1481"></a>
+<span class="sourceLineNo">1482</span>                    if (endOfRoutesLeft &gt; 0) {<a name="line.1482"></a>
+<span class="sourceLineNo">1483</span>                        distanceFromCenter=1;<a name="line.1483"></a>
+<span class="sourceLineNo">1484</span>                        posY=newY;<a name="line.1484"></a>
+<span class="sourceLineNo">1485</span>                        posX=newX;<a name="line.1485"></a>
+<span class="sourceLineNo">1486</span>                        dirY=0-dirY;<a name="line.1486"></a>
+<span class="sourceLineNo">1487</span>                        dirX=0-dirX;<a name="line.1487"></a>
+<span class="sourceLineNo">1488</span>                    }<a name="line.1488"></a>
+<span class="sourceLineNo">1489</span>                }<a name="line.1489"></a>
+<span class="sourceLineNo">1490</span>                //this is the case of edge of the board<a name="line.1490"></a>
+<span class="sourceLineNo">1491</span>                } catch (Exception e) {<a name="line.1491"></a>
+<span class="sourceLineNo">1492</span>                    score += scoreForEdge;<a name="line.1492"></a>
+<span class="sourceLineNo">1493</span>                    endOfRoutesLeft--;<a name="line.1493"></a>
+<span class="sourceLineNo">1494</span>                    if (endOfRoutesLeft &gt; 0) {<a name="line.1494"></a>
+<span class="sourceLineNo">1495</span>                        distanceFromCenter=1;<a name="line.1495"></a>
+<span class="sourceLineNo">1496</span>                        posY=newY;<a name="line.1496"></a>
+<span class="sourceLineNo">1497</span>                        posX=newX;<a name="line.1497"></a>
+<span class="sourceLineNo">1498</span>                        dirY=0-dirY;<a name="line.1498"></a>
+<span class="sourceLineNo">1499</span>                        dirX=0-dirX;<a name="line.1499"></a>
+<span class="sourceLineNo">1500</span>                    }<a name="line.1500"></a>
+<span class="sourceLineNo">1501</span>                }<a name="line.1501"></a>
+<span class="sourceLineNo">1502</span>            }<a name="line.1502"></a>
+<span class="sourceLineNo">1503</span>            return score;<a name="line.1503"></a>
+<span class="sourceLineNo">1504</span>        }<a name="line.1504"></a>
+<span class="sourceLineNo">1505</span>        /**<a name="line.1505"></a>
+<span class="sourceLineNo">1506</span>         * Checks if 2d int array has any other values than zeroes in it.<a name="line.1506"></a>
+<span class="sourceLineNo">1507</span>         * &lt;P&gt;<a name="line.1507"></a>
+<span class="sourceLineNo">1508</span>         * Will go through the array and return true in case there is a number<a name="line.1508"></a>
+<span class="sourceLineNo">1509</span>         * other than the default 0 in any of its indexes. It is used to check<a name="line.1509"></a>
+<span class="sourceLineNo">1510</span>         * if there is need to take humanVictoryBoard or ComputerVictoryBoard<a name="line.1510"></a>
+<span class="sourceLineNo">1511</span>         * into account when determining best possible ai-moves.<a name="line.1511"></a>
+<span class="sourceLineNo">1512</span>         * &lt;P&gt;<a name="line.1512"></a>
+<span class="sourceLineNo">1513</span>         * @param array one "victoryBoard" will be given as a parameter<a name="line.1513"></a>
+<span class="sourceLineNo">1514</span>         * @return true, if there are any values other than 0 in it.<a name="line.1514"></a>
+<span class="sourceLineNo">1515</span>         */<a name="line.1515"></a>
+<span class="sourceLineNo">1516</span>        public boolean areThereNonZeroes (int[][] array) {<a name="line.1516"></a>
+<span class="sourceLineNo">1517</span><a name="line.1517"></a>
+<span class="sourceLineNo">1518</span>            for (int y=0; y&lt;array.length; y++) {<a name="line.1518"></a>
+<span class="sourceLineNo">1519</span>                for (int x=0; x&lt;array[0].length; x++) {<a name="line.1519"></a>
+<span class="sourceLineNo">1520</span>                    if (array[y][x] != 0) {<a name="line.1520"></a>
+<span class="sourceLineNo">1521</span>                        return true;<a name="line.1521"></a>
+<span class="sourceLineNo">1522</span>                    }<a name="line.1522"></a>
+<span class="sourceLineNo">1523</span>                }<a name="line.1523"></a>
+<span class="sourceLineNo">1524</span>            }<a name="line.1524"></a>
+<span class="sourceLineNo">1525</span>            return false;<a name="line.1525"></a>
+<span class="sourceLineNo">1526</span>        }<a name="line.1526"></a>
+<span class="sourceLineNo">1527</span>        /**<a name="line.1527"></a>
+<span class="sourceLineNo">1528</span>         * Uses checkCloseVictoryCase() in all possible directions to get score<a name="line.1528"></a>
+<span class="sourceLineNo">1529</span>         * &lt;P&gt;<a name="line.1529"></a>
+<span class="sourceLineNo">1530</span>         * Will calculate a score, that will be put into priorityBoards index.<a name="line.1530"></a>
+<span class="sourceLineNo">1531</span>         * All coordinates in that board, which are not empty in char[][] board<a name="line.1531"></a>
+<span class="sourceLineNo">1532</span>         * will be given a score. The bigger the score, the better move Ai<a name="line.1532"></a>
+<span class="sourceLineNo">1533</span>         * thinks it would be for this player.<a name="line.1533"></a>
+<span class="sourceLineNo">1534</span>         * &lt;P&gt;<a name="line.1534"></a>
+<span class="sourceLineNo">1535</span>         * @param ownSide Player's tile, whose priorities are being determined.<a name="line.1535"></a>
+<span class="sourceLineNo">1536</span>         * @param posY Coordinate-y of the position to be scored<a name="line.1536"></a>
+<span class="sourceLineNo">1537</span>         * @param posX Coordinate-x of the position to be scored<a name="line.1537"></a>
+<span class="sourceLineNo">1538</span>         * @return score that is total of all directions in the method<a name="line.1538"></a>
+<span class="sourceLineNo">1539</span>         * checkCloseVictoryCase(). <a name="line.1539"></a>
+<span class="sourceLineNo">1540</span>         */<a name="line.1540"></a>
+<span class="sourceLineNo">1541</span>        public int toHowManyDirectionsIsThisMoveCloseToAwinningMove (char ownSide, int posY, int posX) {<a name="line.1541"></a>
+<span class="sourceLineNo">1542</span>            int howManyDirections = 0;<a name="line.1542"></a>
+<span class="sourceLineNo">1543</span>            /*we will put a tile of this player (given as parameter char ownSide), whose winning chances we are trying to check,<a name="line.1543"></a>
+<span class="sourceLineNo">1544</span>            in the position given as parameters. Later in the method it will be changed back to empty, since this is not a real<a name="line.1544"></a>
+<span class="sourceLineNo">1545</span>            move. Instead this is a check that will try to see IF this player put a tile in this place, could he win the game<a name="line.1545"></a>
+<span class="sourceLineNo">1546</span>            the following round. The counter goes up for each direction that it is true. Naturally, if none of the directions could<a name="line.1546"></a>
+<span class="sourceLineNo">1547</span>            give the win the following round, the counter will be returned as 0. */<a name="line.1547"></a>
+<span class="sourceLineNo">1548</span>            board[posY][posX]=ownSide;<a name="line.1548"></a>
+<span class="sourceLineNo">1549</span>    <a name="line.1549"></a>
+<span class="sourceLineNo">1550</span>            for (int i=1; i&lt;=4; i++) {<a name="line.1550"></a>
+<span class="sourceLineNo">1551</span>                howManyDirections += checkCloseToVictoryCase(i, posY, posX);<a name="line.1551"></a>
+<span class="sourceLineNo">1552</span>            }<a name="line.1552"></a>
+<span class="sourceLineNo">1553</span>            //must be changed back to EMPTY because the move is not actually made<a name="line.1553"></a>
+<span class="sourceLineNo">1554</span>            board[posY][posX]=EMPTY;<a name="line.1554"></a>
+<span class="sourceLineNo">1555</span>            return howManyDirections;<a name="line.1555"></a>
+<span class="sourceLineNo">1556</span>        }<a name="line.1556"></a>
+<span class="sourceLineNo">1557</span>        /**<a name="line.1557"></a>
+<span class="sourceLineNo">1558</span>         * Checks in how many directions there is a close victory case.(2-tile)<a name="line.1558"></a>
+<span class="sourceLineNo">1559</span>         * &lt;P&gt;<a name="line.1559"></a>
+<span class="sourceLineNo">1560</span>         * "Close victory case" means a case, where there is a victory not yet<a name="line.1560"></a>
+<span class="sourceLineNo">1561</span>         * achieved, and can't be achieved on the next move, but CAN be<a name="line.1561"></a>
+<span class="sourceLineNo">1562</span>         * achieved a move after that if not stopped by the other player.<a name="line.1562"></a>
+<span class="sourceLineNo">1563</span>         * This method will be always called in 4 directions after one another.<a name="line.1563"></a>
+<span class="sourceLineNo">1564</span>         * &lt;P&gt;<a name="line.1564"></a>
+<span class="sourceLineNo">1565</span>         * @param dir Direction where the check starts to take place. After<a name="line.1565"></a>
+<span class="sourceLineNo">1566</span>         * that it will continue to check it in the opposite direction.<a name="line.1566"></a>
+<span class="sourceLineNo">1567</span>         * @param newY CoordinateY of the tile that is checked<a name="line.1567"></a>
+<span class="sourceLineNo">1568</span>         * @param newX CoordinateX of the tile that is checked<a name="line.1568"></a>
+<span class="sourceLineNo">1569</span>         * @return true if there is a (targetScore-2) tiles in a row.<a name="line.1569"></a>
+<span class="sourceLineNo">1570</span>         */<a name="line.1570"></a>
+<span class="sourceLineNo">1571</span>        public int checkCloseToVictoryCase (int dir, int newY, int newX) {<a name="line.1571"></a>
+<span class="sourceLineNo">1572</span>            /*direction numbers (1-4) also include their opposite direction, so that's why there can be 0, 1 or 2 victory<a name="line.1572"></a>
+<span class="sourceLineNo">1573</span>            cases in each direction */<a name="line.1573"></a>
+<span class="sourceLineNo">1574</span>            int victoryCasesToThisDirection=0;<a name="line.1574"></a>
+<span class="sourceLineNo">1575</span>            char side=board[newY][newX];<a name="line.1575"></a>
+<span class="sourceLineNo">1576</span>            <a name="line.1576"></a>
+<span class="sourceLineNo">1577</span>            int tileCounterToThisDirection=1;<a name="line.1577"></a>
+<span class="sourceLineNo">1578</span>            <a name="line.1578"></a>
+<span class="sourceLineNo">1579</span>            /*if the checker doesnt find enough correct tiles from its direction, it will go back to the<a name="line.1579"></a>
+<span class="sourceLineNo">1580</span>            to the starting position and try to find enough missing ones from the total opposite direction.<a name="line.1580"></a>
+<span class="sourceLineNo">1581</span>            The reason why it's important to keep check of it, is so the checker will not keep changing<a name="line.1581"></a>
+<span class="sourceLineNo">1582</span>            directions endlessly.<a name="line.1582"></a>
+<span class="sourceLineNo">1583</span>            <a name="line.1583"></a>
+<span class="sourceLineNo">1584</span>            Note, that the word "turn" here doesn't have anything to do with which players<a name="line.1584"></a>
+<span class="sourceLineNo">1585</span>            turn it is, but instead the turn of the direction as described above.<a name="line.1585"></a>
+<span class="sourceLineNo">1586</span>            */<a name="line.1586"></a>
+<span class="sourceLineNo">1587</span>            int turnsLeft=1;<a name="line.1587"></a>
+<span class="sourceLineNo">1588</span>    <a name="line.1588"></a>
+<span class="sourceLineNo">1589</span>            /*newY and newX determine the "center" where the directions are determined from, and posY and posX are positions<a name="line.1589"></a>
+<span class="sourceLineNo">1590</span>            where we go from here, checking if there was another tile putted on an empty tile, would it be a winning move*/<a name="line.1590"></a>
+<span class="sourceLineNo">1591</span>            <a name="line.1591"></a>
+<span class="sourceLineNo">1592</span>            int posY=newY;<a name="line.1592"></a>
+<span class="sourceLineNo">1593</span>            int posX=newX;<a name="line.1593"></a>
+<span class="sourceLineNo">1594</span>    <a name="line.1594"></a>
+<span class="sourceLineNo">1595</span>            int dirY=0;<a name="line.1595"></a>
+<span class="sourceLineNo">1596</span>            int dirX=0;<a name="line.1596"></a>
+<span class="sourceLineNo">1597</span>    <a name="line.1597"></a>
+<span class="sourceLineNo">1598</span>            if(dir==1) {<a name="line.1598"></a>
+<span class="sourceLineNo">1599</span>                dirY=1;<a name="line.1599"></a>
+<span class="sourceLineNo">1600</span>                dirX=0;<a name="line.1600"></a>
+<span class="sourceLineNo">1601</span>            } else if(dir==2) {<a name="line.1601"></a>
+<span class="sourceLineNo">1602</span>                dirY=0;<a name="line.1602"></a>
+<span class="sourceLineNo">1603</span>                dirX=1;<a name="line.1603"></a>
+<span class="sourceLineNo">1604</span>            } else if(dir==3) {<a name="line.1604"></a>
+<span class="sourceLineNo">1605</span>                dirY=1;<a name="line.1605"></a>
+<span class="sourceLineNo">1606</span>                dirX=1;<a name="line.1606"></a>
+<span class="sourceLineNo">1607</span>            } else {<a name="line.1607"></a>
+<span class="sourceLineNo">1608</span>                dirY=1;<a name="line.1608"></a>
+<span class="sourceLineNo">1609</span>                dirX=-1;<a name="line.1609"></a>
+<span class="sourceLineNo">1610</span>            }<a name="line.1610"></a>
+<span class="sourceLineNo">1611</span>    <a name="line.1611"></a>
+<span class="sourceLineNo">1612</span>            while(tileCounterToThisDirection &lt;= targetScore &amp;&amp; turnsLeft &gt;= 0) {<a name="line.1612"></a>
+<span class="sourceLineNo">1613</span>                posY+=dirY;<a name="line.1613"></a>
+<span class="sourceLineNo">1614</span>                posX+=dirX;<a name="line.1614"></a>
+<span class="sourceLineNo">1615</span>                //we will use try-catch here, since often it would try to check an index out of the board otherwise.<a name="line.1615"></a>
+<span class="sourceLineNo">1616</span>                try {<a name="line.1616"></a>
+<span class="sourceLineNo">1617</span>                    if (board[posY][posX]==side) {<a name="line.1617"></a>
+<span class="sourceLineNo">1618</span>                        tileCounterToThisDirection++;<a name="line.1618"></a>
+<span class="sourceLineNo">1619</span>                        //this actually should never even happen, since win should have been found before<a name="line.1619"></a>
+<span class="sourceLineNo">1620</span>                        if(tileCounterToThisDirection==targetScore+1) {<a name="line.1620"></a>
+<span class="sourceLineNo">1621</span>                            test("ERROR IN CODE, VICTORY CASE SHOULD HAVE BEEN FOUND BEFORE");<a name="line.1621"></a>
+<span class="sourceLineNo">1622</span>                        }<a name="line.1622"></a>
+<span class="sourceLineNo">1623</span>                    } else if (board[posY][posX]==EMPTY) {<a name="line.1623"></a>
+<span class="sourceLineNo">1624</span>                        //we will temporiraly put a tile in here to help check if it's a winning move<a name="line.1624"></a>
+<span class="sourceLineNo">1625</span>                        board[posY][posX]=side;<a name="line.1625"></a>
+<span class="sourceLineNo">1626</span>                        //we will check the tiles victory case ONLY for the same direction(and the opposite)<a name="line.1626"></a>
+<span class="sourceLineNo">1627</span>                        if (checkVictoryCase(dir, posY, posX)) {<a name="line.1627"></a>
+<span class="sourceLineNo">1628</span>                            victoryCasesToThisDirection++;<a name="line.1628"></a>
+<span class="sourceLineNo">1629</span>                        }<a name="line.1629"></a>
+<span class="sourceLineNo">1630</span>                        board[posY][posX]=EMPTY;<a name="line.1630"></a>
+<span class="sourceLineNo">1631</span>    <a name="line.1631"></a>
+<span class="sourceLineNo">1632</span>                        turnsLeft--;<a name="line.1632"></a>
+<span class="sourceLineNo">1633</span>                        if (turnsLeft&gt;=0) {<a name="line.1633"></a>
+<span class="sourceLineNo">1634</span>                            posY=newY;<a name="line.1634"></a>
+<span class="sourceLineNo">1635</span>                            posX=newX;<a name="line.1635"></a>
+<span class="sourceLineNo">1636</span>                            tileCounterToThisDirection=1;<a name="line.1636"></a>
+<span class="sourceLineNo">1637</span>                            dirY=0-dirY;<a name="line.1637"></a>
+<span class="sourceLineNo">1638</span>                            dirX=0-dirX;<a name="line.1638"></a>
+<span class="sourceLineNo">1639</span>                        }<a name="line.1639"></a>
+<span class="sourceLineNo">1640</span>                    /*this last else case is for the case there is an opponents tile before there is empty tile, so<a name="line.1640"></a>
+<span class="sourceLineNo">1641</span>                    there is no need to check for a winning case, there can't be one, but the opposite direction<a name="line.1641"></a>
+<span class="sourceLineNo">1642</span>                    might still have to be checked*/<a name="line.1642"></a>
+<span class="sourceLineNo">1643</span>                    } else {<a name="line.1643"></a>
+<span class="sourceLineNo">1644</span>                        turnsLeft--;<a name="line.1644"></a>
+<span class="sourceLineNo">1645</span>                        if (turnsLeft&gt;=0) {<a name="line.1645"></a>
+<span class="sourceLineNo">1646</span>                            posY=newY;<a name="line.1646"></a>
+<span class="sourceLineNo">1647</span>                            posX=newX;<a name="line.1647"></a>
+<span class="sourceLineNo">1648</span>                            tileCounterToThisDirection=1;<a name="line.1648"></a>
+<span class="sourceLineNo">1649</span>                            dirY=0-dirY;<a name="line.1649"></a>
+<span class="sourceLineNo">1650</span>                            dirX=0-dirX;<a name="line.1650"></a>
+<span class="sourceLineNo">1651</span>                        }<a name="line.1651"></a>
+<span class="sourceLineNo">1652</span>                    }<a name="line.1652"></a>
+<span class="sourceLineNo">1653</span>                /*it will treat the index out of range the same way as if there was a tile occuped by another player<a name="line.1653"></a>
+<span class="sourceLineNo">1654</span>                there. meaning it will turn back if it hasnt made the turn yet*/<a name="line.1654"></a>
+<span class="sourceLineNo">1655</span>                } catch (Exception e) {<a name="line.1655"></a>
+<span class="sourceLineNo">1656</span>                    turnsLeft--;<a name="line.1656"></a>
+<span class="sourceLineNo">1657</span>                    if (turnsLeft&gt;=0) {<a name="line.1657"></a>
+<span class="sourceLineNo">1658</span>                        posY=newY;<a name="line.1658"></a>
+<span class="sourceLineNo">1659</span>                        posX=newX;<a name="line.1659"></a>
+<span class="sourceLineNo">1660</span>                        tileCounterToThisDirection=1;<a name="line.1660"></a>
+<span class="sourceLineNo">1661</span>                        dirY=0-dirY;<a name="line.1661"></a>
+<span class="sourceLineNo">1662</span>                        dirX=0-dirX;<a name="line.1662"></a>
+<span class="sourceLineNo">1663</span>                    }<a name="line.1663"></a>
+<span class="sourceLineNo">1664</span>                }<a name="line.1664"></a>
+<span class="sourceLineNo">1665</span>            }<a name="line.1665"></a>
+<span class="sourceLineNo">1666</span>            return victoryCasesToThisDirection;<a name="line.1666"></a>
+<span class="sourceLineNo">1667</span>        }<a name="line.1667"></a>
+<span class="sourceLineNo">1668</span>        /**<a name="line.1668"></a>
+<span class="sourceLineNo">1669</span>         * Originally made to give possiblity to obtain other coordinate than<a name="line.1669"></a>
+<span class="sourceLineNo">1670</span>         * the best possible move, but since AiRating idea was abandoned, this<a name="line.1670"></a>
+<span class="sourceLineNo">1671</span>         * remained as a version, where it is used only to get the indexValue 1<a name="line.1671"></a>
+<span class="sourceLineNo">1672</span>         * from a board, if available. If there is no 1 in the board, it will<a name="line.1672"></a>
+<span class="sourceLineNo">1673</span>         * return -1,-1, which can not be used and should be caught in later<a name="line.1673"></a>
+<span class="sourceLineNo">1674</span>         * checks.<a name="line.1674"></a>
+<span class="sourceLineNo">1675</span>         * &lt;P&gt;<a name="line.1675"></a>
+<span class="sourceLineNo">1676</span>         * @param indexValue should always be 1 at the programs current state.<a name="line.1676"></a>
+<span class="sourceLineNo">1677</span>         * @return coordinates int[]{y,x} which will be ai:s next move.<a name="line.1677"></a>
+<span class="sourceLineNo">1678</span>         */<a name="line.1678"></a>
+<span class="sourceLineNo">1679</span>        public int[] coordinatesOfPriorityNo (int indexValue) {<a name="line.1679"></a>
+<span class="sourceLineNo">1680</span>            int [] coordinates = new int[]{-1,-1};<a name="line.1680"></a>
+<span class="sourceLineNo">1681</span>            for (int y = 0; y&lt;hiPriorityBoard.length; y++) {<a name="line.1681"></a>
+<span class="sourceLineNo">1682</span>                for (int x = 0; x&lt;hiPriorityBoard[0].length; x++) {<a name="line.1682"></a>
+<span class="sourceLineNo">1683</span>                    if (hiPriorityBoard[y][x]==indexValue) {<a name="line.1683"></a>
+<span class="sourceLineNo">1684</span>                        coordinates[0]=y;<a name="line.1684"></a>
+<span class="sourceLineNo">1685</span>                        coordinates[1]=x;<a name="line.1685"></a>
+<span class="sourceLineNo">1686</span>                    }<a name="line.1686"></a>
+<span class="sourceLineNo">1687</span>                }<a name="line.1687"></a>
+<span class="sourceLineNo">1688</span>            }<a name="line.1688"></a>
+<span class="sourceLineNo">1689</span>            return coordinates;<a name="line.1689"></a>
+<span class="sourceLineNo">1690</span>        }<a name="line.1690"></a>
+<span class="sourceLineNo">1691</span>    }<a name="line.1691"></a>
+<span class="sourceLineNo">1692</span>}<a name="line.1692"></a>
+<span class="sourceLineNo">1693</span><a name="line.1693"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>
